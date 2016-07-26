@@ -4,10 +4,10 @@ Folders to set up in the install location.
 import os
 from subprocess import call
 
+
 FOLDERS = ['views', 'tables', 'functions', 'stored_procedures', 'permissions']
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+FILES = [os.path.join('permissions', 'grant_schema.sql')]
 
 GRANTS = """
 USE %(db)s;
@@ -21,7 +21,7 @@ GRANT CREATE TABLE TO %(user)s;
 
 """
 
-def run_setup(username, db):
+def run_setup(username, db, gitinit=True):
     """Sets up the appropriate folders."""
     for f in FOLDERS:
         if not os.path.exists(f):
@@ -30,5 +30,7 @@ def run_setup(username, db):
     with open(os.path.join('permissions', 'grant_schema.sql'), 'w') as stream:
         stream.write(GRANTS % {'user': username, 'db': db})
 
-    call('git init', shell=True)
+    if gitinit: #cover: no pragma
+        call('git init', shell=True)
+
     print('All set!')
