@@ -20,7 +20,6 @@ Options:
 import os
 import logging
 import logging.config
-import pickle
 
 from docopt import docopt
 import yaml
