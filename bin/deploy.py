@@ -7,6 +7,7 @@ SQL views, tables, and stored procedures as if they were deployable code.
 Usage:
     deployable.py setup <usr> <db>
     deployable.py <usr> <pwd> <host> <db> [options]
+    deployable.py auto [options]
 
 Options:
     -h, --help                      Show this screen.
@@ -19,6 +20,7 @@ Options:
 import os
 import logging
 import logging.config
+import pickle
 
 from docopt import docopt
 import yaml
@@ -42,10 +44,19 @@ def main():
         logging.config.dictConfig(yaml.load(stream))
     logger = logging.getLogger(__name__)
 
-    d = PyMSSQLDeployer(
-        args['<usr>'], args['<pwd>'], args['<host>'], args['<db>'],
-        schema=args['--schema'], logger=logger
-        )
+    if args['auto']:
+        usr = os.getenv('DEPLOYABLE_USR')
+        pwd = os.getenv('DEPLOYABLE_PWD')
+        host = os.getenv('DEPLOYABLE_HOST')
+        db = os.getenv('DEPLOYABLE_DB')
+        d = PyMSSQLDeployer(
+            usr, pwd, host, db, schema=args['--schema'], logger=logger
+            )
+    else:
+        d = PyMSSQLDeployer(
+            args['<usr>'], args['<pwd>'], args['<host>'], args['<db>'],
+            schema=args['--schema'], logger=logger
+            )
 
     if args['--test']:
         d.test()
