@@ -22,7 +22,7 @@ import logging
 import logging.config
 
 from docopt import docopt
-import yaml
+#import yaml
 
 from deployable_sql.db import PyMSSQLDeployer
 from deployable_sql.folders import run_setup
@@ -39,8 +39,37 @@ def main():
         run_setup(args['<usr>'], args['<db>'])
         return None
 
-    with open(os.path.join(BASE_DIR, 'logging.yml'), 'rb') as stream:
-        logging.config.dictConfig(yaml.load(stream))
+    loggers = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'formatters': {
+            'simple': {
+                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+                }
+            },
+        'handlers': {
+            'console_handler': {
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+                'stream': 'ext://sys.stdout',
+                'level': 'DEBUG'
+                }
+            },
+        'root': {
+            'handlers': ['console_handler'],
+            'level': 'DEBUG'
+            },
+        'loggers': {
+            'default': {
+                'handlers': ['console_handler'],
+                'propagate': False,
+                'level': 'ERROR'
+                }
+            }
+        }
+
+
+    logging.config.dictConfig(loggers)
     logger = logging.getLogger(__name__)
 
     if args['auto']:

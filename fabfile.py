@@ -17,7 +17,7 @@ env.key_filename = 'U:\\.ssh\\id_rsa'
 data = {
     'install_path': '/opt/deployable_sql',
     'current': '/opt/deployable_sql/current',
-    'repo': 'git@deltaco:usc-cu/deployable_sql.git',
+    'repo': 'git@git.usccreditunion.org:cu/deployable_sql.git',
     'build': datetime.now().strftime('%Y%m%d%H%M%S'),
     'settings': 'settings.p',
     'user': env.user
@@ -28,8 +28,8 @@ def deploy():
     """Deploys new code and handles the commands that must follow"""
     with cd('%(install_path)s' % data):
         run('git clone %(repo)s %(build)s' % data)
-        run('cp current/%(settings)s %(build)s/%(settings)s' % data)
-        with cd('%(build)s' % data), prefix('workon deployable_sql'):
+        #run('cp current/%(settings)s %(build)s/%(settings)s' % data)
+        with cd('%(build)s' % data), prefix('workon sql'):
             run('pip install -U pip')
             run('pip install -r requirements.txt')
             run('nosetests -v')
@@ -37,21 +37,23 @@ def deploy():
             remove = 'rm -rf %(current)s' % data
             replace = 'ln -sfn %(install_path)s/%(build)s %(current)s' % data
             run(remove + ' && ' + replace)
+            run('pip uninstall deployable_sql')
+            run('pip install .')
     increment_version()
 
 def create():
     """
     Does initial folder setup.
     """
-    local('ssh-copy-id -i %s %s' % (env.key_filename, env.host_string))
-    put('%(settings)s' % data)
-    sudo('chmod 700 %(settings)s' % data)
+    #local('ssh-copy-id -i %s %s' % (env.key_filename, env.host_string))
+    #put('%(settings)s' % data)
+    #sudo('chmod 700 %(settings)s' % data)
     sudo('mkdir %(install_path)s' % data)
     sudo('chown -R %(user)s:%(user)s %(install_path)s' % data)
     with cd('%(install_path)s' % data):
         run('mkdir current')
-        run('mkvirtualenv deployable_sql')
-        run('mv ~/%(settings)s %(current)s/%(settings)s' % data)
+        run('mkvirtualenv sql')
+        #run('mv ~/%(settings)s %(current)s/%(settings)s' % data)
     # set up log dir
     sudo('mkdir /var/log/deployable_sql')
     sudo('chown -R %(user)s:%(user)s /var/log/deployable_sql' % data)
@@ -59,8 +61,8 @@ def create():
 
 def oneoff():
     """Run deployable_sql as a one off process."""
-    with cd('%(current)s' % data), prefix('workon deployable_sql'):
-        run('python deployable_sql/deployable_sql.py')
+    with cd('%(current)s' % data), prefix('workon sql'):
+        run('python bin/deploy.py auto --all')
 
 def increment_version():
     """Increments setup.py to the next version."""
