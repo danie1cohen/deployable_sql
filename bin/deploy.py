@@ -22,11 +22,39 @@ import logging
 import logging.config
 
 from docopt import docopt
-#import yaml
 
 from deployable_sql.db import PyMSSQLDeployer
 from deployable_sql.folders import run_setup
-from deployable_sql.central import BASE_DIR
+
+
+LOGGERS = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            }
+        },
+    'handlers': {
+        'console_handler': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'stream': 'ext://sys.stdout',
+            'level': 'DEBUG'
+            }
+        },
+    'root': {
+        'handlers': ['console_handler'],
+        'level': 'DEBUG'
+        },
+    'loggers': {
+        'default': {
+            'handlers': ['console_handler'],
+            'propagate': False,
+            'level': 'ERROR'
+            }
+        }
+    }
 
 
 def main():
@@ -39,37 +67,7 @@ def main():
         run_setup(args['<usr>'], args['<db>'])
         return None
 
-    loggers = {
-        'version': 1,
-        'disable_existing_loggers': True,
-        'formatters': {
-            'simple': {
-                'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-                }
-            },
-        'handlers': {
-            'console_handler': {
-                'class': 'logging.StreamHandler',
-                'formatter': 'simple',
-                'stream': 'ext://sys.stdout',
-                'level': 'DEBUG'
-                }
-            },
-        'root': {
-            'handlers': ['console_handler'],
-            'level': 'DEBUG'
-            },
-        'loggers': {
-            'default': {
-                'handlers': ['console_handler'],
-                'propagate': False,
-                'level': 'ERROR'
-                }
-            }
-        }
-
-
-    logging.config.dictConfig(loggers)
+    logging.config.dictConfig(LOGGERS)
     logger = logging.getLogger(__name__)
 
     if args['auto']:
@@ -92,6 +90,9 @@ def main():
     if args['--all'] or args['--views']:
         views = os.path.join('.', 'views')
         d.sync_views(views)
+
+    if args['--filename']:
+        d.sync_file(args['--filename'])
 
     print('Done!')
 
