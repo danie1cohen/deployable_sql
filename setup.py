@@ -11,8 +11,8 @@ config = {
     'url': 'deltaco.usccreditunion.org',
     'download_url': 'git.usccreditunion.org',
     'author_email': 'dcohen@usccreditunion.org',
-    'version': '0.0.6',
-    'install_requires': ['PyYAML==3.11', 'pymssql==2.1.3', 'docopt==0.6.2'],
+    'version': '0.0.7',
+    'install_requires': ['pymssql==2.1.3', 'docopt==0.6.2'],
     'packages': ['deployable_sql'],
     'scripts': ['bin/deploy.py'],
     'name': 'deployable_sql'
