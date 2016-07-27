@@ -49,7 +49,7 @@ class BaseDeployer(object):
             segs = path.split(os.path.sep)
             if len(segs) != 2:
                 raise IllegalPathError
-            return path_mappings[segs[0]](segs[-1])
+            return path_mappings[segs[0]](path)
         else:
             # if partial path is provided, find the right folder
             for root, _, files in os.walk('.'):
