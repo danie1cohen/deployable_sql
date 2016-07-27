@@ -13,7 +13,7 @@ class BaseDeployer(object):
         self.logger = logger
 
 
-class PyMSSQLDeployer(object):
+class PyMSSQLDeployer(BaseDeployer):
     """Class used to deploy source controlled SQL files to datbase"""
     def __init__(self, usr, pwd, host, db, **kwargs):
         """Creates an engine connection."""
