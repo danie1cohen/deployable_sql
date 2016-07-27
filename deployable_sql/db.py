@@ -17,7 +17,7 @@ class PyMSSQLDeployer(object):
     """Class used to deploy source controlled SQL files to datbase"""
     def __init__(self, usr, pwd, host, db, **kwargs):
         """Creates an engine connection."""
-        super(PyMSSQLDeployer, self).__init__(kwargs)
+        super(PyMSSQLDeployer, self).__init__(**kwargs)
         self.conn = pymssql.connect(host, usr, pwd, db)
         self.conn.autocommit(True)
         self.cursor = self.conn.cursor()

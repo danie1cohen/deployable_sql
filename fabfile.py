@@ -37,7 +37,7 @@ def deploy():
             remove = 'rm -rf %(current)s' % data
             replace = 'ln -sfn %(install_path)s/%(build)s %(current)s' % data
             run(remove + ' && ' + replace)
-            run('pip uninstall deployable_sql')
+            run('pip uninstall -y deployable_sql')
             run('pip install .')
     increment_version()
 
