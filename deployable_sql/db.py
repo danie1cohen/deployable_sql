@@ -58,7 +58,7 @@ class PyMSSQLDeployer(BaseDeployer):
         """
         Executes some sql, with a little logging.
         """
-        self.logger.debug('Executing sql:\n\n%s\n\n' % sql[:140])
+        self.logger.debug('Executing sql:\n\n%s...\n\n' % sql[:140])
         self.cursor.execute(sql)
         try:
             rows = self.cursor.fetchall()
@@ -80,4 +80,4 @@ class PyMSSQLDeployer(BaseDeployer):
 
     def _create_view(self, name, sql):
         """Turns a sql select statement into a create view statement."""
-        return "CREATE VIEW %s AS %s;" % (self._schema_path(name), sql)
+        return "CREATE VIEW %s AS \n%s;" % (self._schema_path(name), sql)
