@@ -5,8 +5,34 @@ Class that interacts with the database.
 import os
 
 import pymssql
+from sqlalchemy import create_engine, text
+from dateutil.parser import parse
+
+import yaml
 
 from .exc import IllegalPathError
+
+
+
+TSQL_FREQ_TYPES = {
+    'once': 1,
+    'daily': 4,
+    'weekly': 8,
+    'monthly': 16,
+    'monthly_relative': 32,
+    'on_agent_start': 64,
+    'idle': 128
+}
+
+TSQL_FREQ_INTS = {
+    'sunday': 1,
+    'monday': 2,
+    'tuesday': 4,
+    'wednesday': 8,
+    'thursday': 16,
+    'friday': 32,
+    'saturday': 64
+}
 
 
 class BaseDeployer(object):
@@ -35,6 +61,10 @@ class BaseDeployer(object):
         """Syncs a view."""
         raise NotImplementedError
 
+    def sync_job(self, path):
+        """Syncs a job, step, schedule."""
+        raise NotImplementedError
+
     def sync_file(self, path):
         """Syncs a file of not yet determined type."""
         path_mappings = {
@@ -43,6 +73,7 @@ class BaseDeployer(object):
             'stored_procedures': self.sync_stored_procedure,
             'tables': self.sync_table,
             'views': self.sync_view,
+            'jobs': self.sync_job,
 
         }
         if os.path.sep in path:
@@ -98,6 +129,19 @@ class BaseDeployer(object):
                 continue
             self.sync_file(os.path.join(folder, sql))
 
+class SqlAlchemyDeployer(BaseDeployer):
+    """A deployer that uses sql alchemy conn strings."""
+    def __init__(self, conn_string, **kwargs):
+        super(SqlAlchemyDeployer, self).__init__(**kwargs)
+        self.engine = create_engine(conn_string)
+
+    def _exec(self, sql):
+        result = self.engine.execute(text(sql))
+        self.logger.debug(result.fetchall())
+
+    def test(self):
+        self._exec('SELECT * FROM INFORMATION_SCHEMA')
+
 
 class PyMSSQLDeployer(BaseDeployer):
     """Class used to deploy source controlled SQL files to datbase"""
@@ -139,6 +183,23 @@ class PyMSSQLDeployer(BaseDeployer):
         # nothing fancy required here, the sql is a create statement
         self._exec(sql)
 
+    def sync_job(self, path):
+        """
+        Takes a dict that could be interpreted from json, yaml, or python
+        and creates a job, steps and schedule based on it.
+        """
+        with open(path, 'rb') as stream:
+            job = yaml.load(stream)
+        job_name, build_sql = read_job(job)
+        drop_sql = """DECLARE @job_id int;
+        SELECT @job_id = job_id FROM msdb.dbo.sysjobs WHERE name = %s
+        IF (@job_id IS NOT NULL)
+        BEGIN
+            EXEC msdb.dbo.sp_delete_job @job_id
+        END""" % job_name
+        self._exec_(drop_sql)
+        self._exec(build_sql)
+
     def test(self):
         """Runs a simple test select statement."""
         self._exec('SELECT * FROM INFORMATION_SCHEMA.TABLES')
@@ -175,3 +236,52 @@ def _if_drop(schema_dot_obj, object_type='VIEW'):
     sql = """IF OBJECT_ID ('%(schema_dot_obj)s') IS NOT NULL
     DROP %(object_type)s %(schema_dot_obj)s;"""
     return sql % args
+
+def read_job(job):
+    """
+    Parses a job object.
+    """
+    job_template = """EXEC sp_add_job
+    @job_name = %s;\n"""
+
+    step_template = """EXEC sp_add_jobstep
+    @job_name = N'%s',
+    @step_name = N'%s',
+    @subsystem = N'TSQL',
+    @command = %s\n"""
+
+    schedule_template = """EXEC sp_add_jobschedule
+    @job_name = N'%s',
+    @name = '%s',
+    @freq_type = %d,
+    @freq_interval = %d,
+    @active_start_date = %s,
+    @active_start_time = %s,
+    """
+
+    for job_name, settings in job.items():
+        sql = job_template % job_name
+
+        for step in settings['steps']:
+            sql += step_template % (
+                job_name,
+                step['step_name'],
+                step['command']
+                )
+
+        for schedule in settings['schedules']:
+            try:
+                freq_interval = TSQL_FREQ_INTS[schedule['frequency_interval']]
+            except KeyError:
+                freq_interval = schedule['frequency_interval']
+
+            sql += schedule_template % (
+                job_name,
+                schedule['schedule_name'],
+                TSQL_FREQ_TYPES[schedule['frequency_type']],
+                freq_interval,
+                parse(schedule['active_start_date']).strftime('YYYYMMDD'),
+                schedule['active_start_time']
+                )
+        print(sql)
+        return job_name, sql
