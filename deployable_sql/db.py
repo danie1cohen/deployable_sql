@@ -4,6 +4,7 @@ Class that interacts with the database.
 # pylint: disable=abstract-method
 import os
 from datetime import datetime
+from collections import OrderedDict
 
 import pymssql
 from sqlalchemy import create_engine, text
@@ -249,20 +250,22 @@ def read_job(job):
     job_template = """EXEC sp_add_job
     @job_name = %s;\n\n"""
 
+    formatters = OrderedDict([
+        ('steps', format_step),
+        ('schedules', format_sched),
+        ('alerts', format_alert),
+    ])
+
     for job_name, settings in job.items():
         sql += job_template % job_name
-        
-        for step in settings['steps']:
-            step['job_name'] = job_name
-            sql += format_step(step)
 
-        for schedule in settings['schedules']:
-            schedule['job_name'] = job_name
-            sql += format_sched(schedule)
-
-        for alert in settings['alerts']:
-            alert['job_name'] = job_name
-            sql += format_alert(alert)
+        for label, method in formatters.items():
+            try:
+                for attr in settings[label]:
+                    attr['job_name'] = job_name
+                    sql += method(attr)
+            except KeyError:
+                pass
 
         print(sql)
         return job_name, sql
@@ -285,12 +288,12 @@ def format_freq_interval(fq):
 
 def format_sched(schedule):
     """Format the schedule values all nice, and set any missing defaults."""
-    formatters = {
+    validators = {
         'active_start_date': lambda x: parse(x).strftime('%Y%m%d'),
         'freq_type': lambda x: TSQL_FREQ_TYPES[x],
         'freq_interval': format_freq_interval
     }
-    for key, func in formatters.items():
+    for key, func in validators.items():
         schedule[key] = func(schedule[key])
 
     defaults = {
