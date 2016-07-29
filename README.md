@@ -8,21 +8,35 @@ This module makes SQL versionable and deployable like other code.
 Running `deploy.py setup <usr> <db>` will create the folder structure you need.
 
 * functions
-* tables
+* jobs
 * permissions
 * stored_procedures
+* tables
+* views
 
-For each file in these folders, write your sql as a create statement. When
-syncing, the deploy script will drop the existing object and create the new
-one in its place, keeping code static and stable.
+For each file in the tables, functions, and stored_proced, write your sql as a
+create statement. When syncing, the deploy script will drop the existing object
+and create the new one in its place, keeping code static and stable.
 
 * views
 
 For views, we made it even easier.  Just write a select statement, and the
 script will convert it into a CREATE VIEW statement.
 
-Once you are set up, run the grant_deployable.sql script manually to give your
-deployable_sql service the rights to read write and control your tables.
+* jobs
+
+Jobs are a little bit more involved.  Instead of making you write the SQL that
+adds jobs, adds steps to the job, and adds schedules, you can define an object
+in yaml that is structured in such a way that the script will do the work. A
+quick way to do this is to invoke `deploy.py create_job <jobname>`.
+
+* permissions
+
+Once you are set up, run the grant_deployable.sql script as a database admin
+manually to give your deployable_sql service the rights to read write and
+control your tables.  We suggest that you do not use the deployer service to
+manage permissions automatically, but store the permissions as scripts and run
+them manually as needed.
 
 Then, you can start syncing away with `deploy.py sync -all`
 
