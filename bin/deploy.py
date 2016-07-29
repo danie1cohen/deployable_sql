@@ -8,6 +8,7 @@ Usage:
     deployable.py setup <usr> <db>
     deployable.py sync <usr> <pwd> <host> <db> [options]
     deployable.py auto [options]
+    deployable.py create_job <jobname>
 
 Options:
     -h, --help                      Show this screen.
@@ -24,7 +25,7 @@ import logging.config
 from docopt import docopt
 
 from deployable_sql.db import PyMSSQLDeployer
-from deployable_sql.folders import run_setup
+from deployable_sql.folders import run_setup, create_job
 
 
 LOGGERS = {
@@ -83,16 +84,25 @@ def main():
             args['<usr>'], args['<pwd>'], args['<host>'], args['<db>'],
             schema=args['--schema'], logger=logger
             )
-
+    views = os.path.join('.', 'views')
+    tables = os.path.join('.', 'tables')
+    functions = os.path.join('.', 'functions')
+    stored_procedures = os.path.join('.', 'stored_procedures')
+    jobs = os.path.join('.', 'jobs')
     if args['--test']:
         d.test()
 
-    if args['--all'] or args['--views']:
-        views = os.path.join('.', 'views')
+    if args['--all']:
         d.sync_folder(views)
-
-    if args['--filename']:
+        #d.sync_folder(functions)
+        #d.sync_folder(stored_procedures)
+        #d.sync_folder(jobs)
+    elif args['--views']:
+        d.sync_folder(views)
+    elif args['--filename']:
         d.sync_file(args['--filename'])
+    elif args['create_job']:
+        create_job(args['<jobname>'])
 
     print('Done!')
 
