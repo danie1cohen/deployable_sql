@@ -75,8 +75,6 @@ class TestDeployableSql(object):
 
     def test_read_job(self):
         print(self.job)
-        job_name, job_sql, step_sql, schedule_sql = read_job(self.job)
+        job_name, sql = read_job(self.job)
         eq_(job_name, 'testjob')
-        assert job_sql.startswith('EXEC sp_add_job')
-        assert step_sql.startswith('EXEC sp_add_jobstep')
-        assert schedule_sql.startswith('EXEC sp_add_jobschedule')
+        assert sql.startswith('EXEC sp_add_job')
