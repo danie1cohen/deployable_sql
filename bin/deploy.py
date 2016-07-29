@@ -16,7 +16,8 @@ Options:
     --schema=<schema>               Specify a non-standard schema. [default: cu]
     --all                           Rebuild everything.
     --views                         Rebuild only views.
-    --test                          Test the connection
+    --jobs                          Rebuild the jobs folder.
+    --test                          Test the connection.
 """
 import os
 import logging
