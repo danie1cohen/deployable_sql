@@ -155,7 +155,7 @@ class PyMSSQLDeployer(BaseDeployer):
 
     def sync_view(self, path):
         """Drops the view if it already exists, then and recreates it."""
-        schema_dot_obj, sql = self._parse_path(path)[:3]
+        schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing view: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj)
         # remove any ORDER BY statements
