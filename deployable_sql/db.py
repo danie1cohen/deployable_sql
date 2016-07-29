@@ -248,7 +248,7 @@ def read_job(job):
     """
     sql = 'USE msdb;\n\n'
     job_template = """EXEC sp_add_job
-    @job_name = %s
+    @job_name = %s,
     @notify_level_email = 3,
     @notify_email_operator = N'Dan Cohen',
     @notify_level_eventlog = 0
