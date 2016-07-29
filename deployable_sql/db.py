@@ -109,7 +109,7 @@ class BaseDeployer(object):
                 raise IllegalPathError
             else:
                 folder, filename = segs
-        basename, ext = os.splitext(os.path.basename(path))
+        basename, ext = os.path.splitext(os.path.basename(path))
         self.logger.debug('parts: (%s, %s, %s)', folder, basename, ext)
 
         schema_dot_obj = self._schema_path(basename)
