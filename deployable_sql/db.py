@@ -164,7 +164,7 @@ class PyMSSQLDeployer(BaseDeployer):
         build_sql = "CREATE VIEW %s AS \n%s;" % (schema_dot_obj, sql)
         self._exec(drop_sql)
         self._exec(build_sql)
-        self._exec('SELECT TOP 1 * FROM %s' % schema_dot_obj)
+        #self._exec('SELECT TOP 1 * FROM %s' % schema_dot_obj)
 
     def sync_function(self, path):
         """Syncs a function."""
