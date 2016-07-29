@@ -242,7 +242,9 @@ def read_job(job):
     """
     Parses a job object.
     """
-    job_template = """EXEC sp_add_job
+    job_template = """USE msdb;
+
+    EXEC sp_add_job
     @job_name = %s;\n"""
 
     step_template = """EXEC sp_add_jobstep
