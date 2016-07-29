@@ -249,7 +249,7 @@ def read_job(job):
     @job_name = N'%s',
     @step_name = N'%s',
     @subsystem = N'TSQL',
-    @command = %s\n"""
+    @command = '%s'\n"""
 
     schedule_template = """EXEC sp_add_jobschedule
     @job_name = N'%s',
@@ -257,7 +257,7 @@ def read_job(job):
     @freq_type = %d,
     @freq_interval = %d,
     @active_start_date = %s,
-    @active_start_time = %s,
+    @active_start_time = %s
     """
 
     for job_name, settings in job.items():
@@ -281,7 +281,7 @@ def read_job(job):
                 schedule['schedule_name'],
                 TSQL_FREQ_TYPES[schedule['frequency_type']],
                 freq_interval,
-                parse(schedule['active_start_date']).strftime('YYYYMMDD'),
+                parse(schedule['active_start_date']).strftime('%Y%m%d'),
                 schedule['active_start_time']
                 )
         print(sql)
