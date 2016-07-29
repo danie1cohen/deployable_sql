@@ -249,7 +249,7 @@ def read_job(job):
     job_template = """EXEC sp_add_job
     @job_name = %s,
     @notify_level_email = 3,
-    @notify_email_operator = N'Dan Cohen',
+    @notify_email_operator_name = N'Dan Cohen',
     @notify_level_eventlog = 0
     ;\n\n"""
 
