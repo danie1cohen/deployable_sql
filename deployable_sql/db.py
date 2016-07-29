@@ -248,7 +248,11 @@ def read_job(job):
     """
     sql = 'USE msdb;\n\n'
     job_template = """EXEC sp_add_job
-    @job_name = %s;\n\n"""
+    @job_name = %s
+    @notify_level_email = 3,
+    @notify_email_operator = N'Dan Cohen',
+    @notify_level_eventlog = 0
+    ;\n\n"""
 
     formatters = OrderedDict([
         ('steps', format_step),
@@ -261,9 +265,9 @@ def read_job(job):
 
         for label, method in formatters.items():
             try:
-                for attr in settings[label]:
-                    attr['job_name'] = job_name
-                    sql += method(attr)
+                for attrs in settings[label]:
+                    attrs['job_name'] = job_name
+                    sql += method(attrs)
             except KeyError:
                 pass
 
