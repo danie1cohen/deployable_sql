@@ -193,7 +193,7 @@ class PyMSSQLDeployer(BaseDeployer):
             job = yaml.load(stream)
         job_name, build_sql = read_job(job)
         drop_sql = """DECLARE @job_id int;
-        SELECT @job_id = job_id FROM msdb.dbo.sysjobs WHERE name = %s
+        SELECT @job_id = job_id FROM msdb.dbo.sysjobs WHERE name = '%s'
         IF (@job_id IS NOT NULL)
         BEGIN
             EXEC msdb.dbo.sp_delete_job @job_id
