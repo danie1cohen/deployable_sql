@@ -198,7 +198,7 @@ class PyMSSQLDeployer(BaseDeployer):
         BEGIN
             EXEC msdb.dbo.sp_delete_job @job_id
         END""" % job_name
-        self._exec_(drop_sql)
+        self._exec(drop_sql)
         self._exec(build_sql)
 
     def test(self):
