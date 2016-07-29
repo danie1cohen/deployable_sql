@@ -93,10 +93,10 @@ def main():
     functions = os.path.join('.', 'functions')
     stored_procedures = os.path.join('.', 'stored_procedures')
     jobs = os.path.join('.', 'jobs')
+
     if args['--test']:
         d.test()
-
-    if args['--all']:
+    elif args['--all']:
         d.sync_folder(views)
         d.sync_folder(jobs)
         #d.sync_folder(functions)

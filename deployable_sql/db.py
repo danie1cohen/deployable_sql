@@ -127,9 +127,8 @@ class BaseDeployer(object):
         """
         Syncs all the views in a given folder (that wend with ext .sql).
         """
+        self.logger.debug('Looking for files in: %s', folder)
         for sql in os.listdir(folder):
-            if not sql.endswith('.sql'):
-                continue
             self.sync_file(os.path.join(folder, sql))
 
 class SqlAlchemyDeployer(BaseDeployer):
