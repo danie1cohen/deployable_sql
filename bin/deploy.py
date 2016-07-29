@@ -97,11 +97,13 @@ def main():
 
     if args['--all']:
         d.sync_folder(views)
+        d.sync_folder(jobs)
         #d.sync_folder(functions)
         #d.sync_folder(stored_procedures)
-        #d.sync_folder(jobs)
     elif args['--views']:
         d.sync_folder(views)
+    elif args['--jobs']:
+        d.sync_folder(jobs)
     elif args['--filename']:
         d.sync_file(args['--filename'])
 
