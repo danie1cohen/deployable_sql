@@ -3,6 +3,7 @@ Class that interacts with the database.
 """
 # pylint: disable=abstract-method
 import os
+from datetime import datetime
 
 import pymssql
 from sqlalchemy import create_engine, text
@@ -137,10 +138,12 @@ class SqlAlchemyDeployer(BaseDeployer):
         self.engine = create_engine(conn_string)
 
     def _exec(self, sql):
+        """Execute a statement."""
         result = self.engine.execute(text(sql))
         self.logger.debug(result.fetchall())
 
     def test(self):
+        """Run a quick test to see if this even works."""
         self._exec('SELECT * FROM INFORMATION_SCHEMA')
 
 
@@ -242,49 +245,64 @@ def read_job(job):
     """
     Parses a job object.
     """
-    job_template = """USE msdb;
-
-    EXEC sp_add_job
-    @job_name = %s;\n"""
+    sql = 'USE msdb;\n\n'
+    job_template = """EXEC sp_add_job
+    @job_name = %s;\n\n"""
 
     step_template = """EXEC sp_add_jobstep
     @job_name = N'%s',
     @step_name = N'%s',
     @subsystem = N'TSQL',
-    @command = '%s'\n"""
-
-    schedule_template = """EXEC sp_add_jobschedule
-    @job_name = N'%s',
-    @name = '%s',
-    @freq_type = %d,
-    @freq_interval = %d,
-    @active_start_date = %s,
-    @active_start_time = %s
-    """
+    @command = '%s'\n\n"""
 
     for job_name, settings in job.items():
-        sql = job_template % job_name
+        sql += job_template % job_name
 
         for step in settings['steps']:
-            sql += step_template % (
-                job_name,
-                step['step_name'],
-                step['command']
-                )
+            sql += step_template % (job_name,
+                                    step['step_name'],
+                                    step['command'])
 
         for schedule in settings['schedules']:
-            try:
-                freq_interval = TSQL_FREQ_INTS[schedule['frequency_interval']]
-            except KeyError:
-                freq_interval = schedule['frequency_interval']
+            schedule['job_name'] = job_name
+            sql += format_sched(schedule)
 
-            sql += schedule_template % (
-                job_name,
-                schedule['schedule_name'],
-                TSQL_FREQ_TYPES[schedule['frequency_type']],
-                freq_interval,
-                parse(schedule['active_start_date']).strftime('%Y%m%d'),
-                schedule['active_start_time']
-                )
         print(sql)
         return job_name, sql
+
+def format_freq_interval(fq):
+    """Try to format the interval, but not too hard."""
+    try:
+        return TSQL_FREQ_INTS[fq]
+    except KeyError:
+        return fq
+
+def format_sched(schedule):
+    """Format the schedule values all nice, and set any missing defaults."""
+    formatters = {
+        'active_start_date': lambda x: parse(x).strftime('%Y%m%d'),
+        'freq_type': lambda x: TSQL_FREQ_TYPES[x],
+        'freq_interval': format_freq_interval
+    }
+    for key, func in formatters.items():
+        schedule[key] = func(schedule[key])
+
+    defaults = {
+        'name': 'daily',
+        'freq_type': 4,
+        'freq_interval': 0,
+        'freq_recurrence_factor': 0,
+        'active_start_date': datetime.now().strftime('%Y%m%d'),
+        'active_start_time': '0700'
+    }
+    for key in defaults.keys():
+        try:
+            schedule[key]
+        except KeyError:
+            schedule[key] = defaults[key]
+
+    schedule_template = 'EXEC sp_add_jobschedule\n'
+    for key, val in schedule.items():
+        schedule_template += '\t@%s = %s\n' % (key, val)
+
+    return schedule_template
