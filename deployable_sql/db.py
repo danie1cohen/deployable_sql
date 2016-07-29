@@ -80,7 +80,7 @@ class BaseDeployer(object):
             # if full path is provided, just decide on the right function
             segs = path.split(os.path.sep)
             if len(segs) != 2:
-                raise IllegalPathError
+                raise IllegalPathError(path)
             return path_mappings[segs[0]](path)
         else:
             # if partial path is provided, find the right folder
@@ -92,7 +92,7 @@ class BaseDeployer(object):
                         clean_root = root.split(os.path.sep)[-1]
                         full_path = os.path.join(clean_root, f)
                         return path_mappings[clean_root](full_path)
-        raise IllegalPathError
+        raise IllegalPathError(path)
 
     def _parse_path(self, path):
         """

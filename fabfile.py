@@ -34,7 +34,7 @@ def deploy():
             run('pip install -r requirements.txt')
             run('nosetests -v')
             # if tests pass, change symlink
-            remove = 'rm -rf %(current)s' % data
+            remove = 'rm %(current)s' % data
             replace = 'ln -sfn %(install_path)s/%(build)s %(current)s' % data
             run(remove + ' && ' + replace)
             run('pip uninstall -y deployable_sql')
