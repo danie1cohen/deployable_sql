@@ -10,19 +10,25 @@ import os
 from nose.tools import *
 
 
-from deployable_sql.folders import run_setup, FOLDERS, FILES
-from deployable_sql.db import BaseDeployer, PyMSSQLDeployer
+from deployable_sql.folders import run_setup, FOLDERS, FILES, create_job
+from deployable_sql.db import (
+    BaseDeployer, PyMSSQLDeployer, SqlAlchemyDeployer, read_job
+    )
 from deployable_sql.exc import IllegalPathError
 
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 class TestDeployableSql(object):
     def setup(self):
         print('SETUP!')
-        run_setup('blank', 'whatever', gitinit=False)
         self.b = BaseDeployer()
+        self.job = create_job('testjob')
 
     def teardown(self):
         print('TEAR DOWN!')
+        if os.path.exists(os.path.join('jobs', 'testjob.yml')):
+            os.remove(os.path.join('jobs', 'testjob.yml'))
         for f in FILES:
             if os.path.exists(f):
                 os.remove(f)
@@ -31,6 +37,7 @@ class TestDeployableSql(object):
                 os.rmdir(f)
 
     def test_folders(self):
+        run_setup('blank', 'whatever', gitinit=False)
         for f in FOLDERS:
             assert os.path.exists(f)
         for f in FILES:
@@ -40,16 +47,36 @@ class TestDeployableSql(object):
         assert self.b
 
     def test_pymssql_deployer(self):
+        #d = PyMSSQLDeployer('', '', '', '')
         pass
+
+    def test_sqlalchemy_deployer(self):
+        d = SqlAlchemyDeployer('sqlite://')
+        ok_(d)
+
+    @nottest
+    def test_sqlalchemy_deployer(self):
+        d = SqlAlchemyDeployer('mssql+pyodbc://svcDeployerSQL::qPU1NdiU0LFXIRgY6z5d@hosutons/ARCUSYM000')
+        ok_(d.test())
 
     @raises(NotImplementedError)
     def test_sync_file_full(self):
+        run_setup('blank', 'whatever', gitinit=False)
         self.b.sync_file('permissions/grant_deployable.sql')
 
     @raises(NotImplementedError)
     def test_sync_file_partial(self):
+        run_setup('blank', 'whatever', gitinit=False)
         self.b.sync_file('grant_deployable.sql')
 
     @raises(IllegalPathError)
     def test_sync_file_bad(self):
         self.b.sync_file('no_such_file.sql')
+
+    def test_read_job(self):
+        print(self.job)
+        job_name, job_sql, step_sql, schedule_sql = read_job(self.job)
+        eq_(job_name, 'testjob')
+        assert job_sql.startswith('EXEC sp_add_job')
+        assert step_sql.startswith('EXEC sp_add_jobstep')
+        assert schedule_sql.startswith('EXEC sp_add_jobschedule')
