@@ -67,6 +67,9 @@ def main():
     if args['setup']:
         run_setup(args['<usr>'], args['<db>'])
         return None
+    elif args['create_job']:
+        create_job(args['<jobname>'])
+        return None
 
     logging.config.dictConfig(LOGGERS)
     logger = logging.getLogger(__name__)
@@ -101,8 +104,7 @@ def main():
         d.sync_folder(views)
     elif args['--filename']:
         d.sync_file(args['--filename'])
-    elif args['create_job']:
-        create_job(args['<jobname>'])
+
 
     print('Done!')
 
