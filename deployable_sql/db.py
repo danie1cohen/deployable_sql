@@ -99,6 +99,7 @@ class BaseDeployer(object):
         Breaks the path up into its important elements and returns them as a
         tuple:
         """
+        if path.startswith('.'): path = path.split(os.path.sep, 1)[-1]
         self.logger.debug('path: %s', path)
 
         folder = None
