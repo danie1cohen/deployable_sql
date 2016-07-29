@@ -77,6 +77,7 @@ class BaseDeployer(object):
 
         }
         if os.path.sep in path:
+            if path.startswith('.'): path = path.split(os.path.sep, 1)[-1]
             # if full path is provided, just decide on the right function
             segs = path.split(os.path.sep)
             if len(segs) != 2:
@@ -99,7 +100,6 @@ class BaseDeployer(object):
         Breaks the path up into its important elements and returns them as a
         tuple:
         """
-        if path.startswith('.'): path = path.split(os.path.sep, 1)[-1]
         self.logger.debug('path: %s', path)
 
         folder = None
