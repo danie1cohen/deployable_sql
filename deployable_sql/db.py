@@ -249,26 +249,32 @@ def read_job(job):
     job_template = """EXEC sp_add_job
     @job_name = %s;\n\n"""
 
-    step_template = """EXEC sp_add_jobstep
-    @job_name = N'%s',
-    @step_name = N'%s',
-    @subsystem = N'TSQL',
-    @command = '%s'\n\n"""
-
     for job_name, settings in job.items():
         sql += job_template % job_name
-
+        
         for step in settings['steps']:
-            sql += step_template % (job_name,
-                                    step['step_name'],
-                                    step['command'])
+            step['job_name'] = job_name
+            sql += format_step(step)
 
         for schedule in settings['schedules']:
             schedule['job_name'] = job_name
             sql += format_sched(schedule)
 
+        for alert in settings['alerts']:
+            alert['job_name'] = job_name
+            sql += format_alert(alert)
+
         print(sql)
         return job_name, sql
+
+def format_step(step):
+    """Returns SQL formatted add step command."""
+    sql = """EXEC sp_add_jobstep
+    @job_name = N'%(job_name)s',
+    @step_name = N'%(step_name)s',
+    @subsystem = N'TSQL',
+    @command = '%(command)s'\n\n"""
+    return sql % step
 
 def format_freq_interval(fq):
     """Try to format the interval, but not too hard."""
@@ -300,11 +306,17 @@ def format_sched(schedule):
             schedule[key]
         except KeyError:
             schedule[key] = defaults[key]
+    return build_exec_wparams('sp_add_jobschedule', schedule)
 
-    schedule_template = 'EXEC sp_add_jobschedule'
+def format_alert(alert):
+    """Returns a SQL formatted create alert command."""
+    return build_exec_wparams('sp_add_alert', alert)
+
+def build_exec_wparams(executable, params):
+    """Returns TSQL formatted command to add an alert."""
+    sql = 'EXEC %s' % executable
     delim = '\n'
-    for key, val in schedule.items():
-        schedule_template += delim + '\t@%s = %s' % (key, val)
+    for key, val in params.items():
+        sql += delim + '\t@%s = %s' % (key, val)
         delim = ',\n'
-
-    return schedule_template
+    return sql
