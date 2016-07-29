@@ -192,7 +192,7 @@ class PyMSSQLDeployer(BaseDeployer):
         with open(path, 'rb') as stream:
             job = yaml.load(stream)
         job_name, build_sql = read_job(job)
-        drop_sql = """DECLARE @job_id int;
+        drop_sql = """DECLARE @job_id binary(16);
         SELECT @job_id = job_id FROM msdb.dbo.sysjobs WHERE name = '%s'
         IF (@job_id IS NOT NULL)
         BEGIN
