@@ -301,8 +301,10 @@ def format_sched(schedule):
         except KeyError:
             schedule[key] = defaults[key]
 
-    schedule_template = 'EXEC sp_add_jobschedule\n'
+    schedule_template = 'EXEC sp_add_jobschedule'
+    delim = '\n'
     for key, val in schedule.items():
-        schedule_template += '\t@%s = %s\n' % (key, val)
+        schedule_template += delim + '\t@%s = %s' % (key, val)
+        delim = ',\n'
 
     return schedule_template
