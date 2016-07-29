@@ -168,7 +168,7 @@ class PyMSSQLDeployer(BaseDeployer):
 
     def sync_function(self, path):
         """Syncs a function."""
-        schema_dot_obj, sql = self._parse_path(path)[:3]
+        schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing function: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj, object_type='FUNCTION')
         self._exec(drop_sql)
@@ -177,7 +177,7 @@ class PyMSSQLDeployer(BaseDeployer):
 
     def sync_stored_procedure(self, path):
         """Syncs a stored procedure."""
-        schema_dot_obj, sql = self._parse_path(path)[:3]
+        schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing stored procedure: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj, object_type='PROCEDURE')
         self._exec(drop_sql)
