@@ -54,3 +54,5 @@ fi
 chown -R $HOME_USER:$HOME_USER /opt /home/$HOME_USER/.bash_profile
 
 apt-get install -y freetds-dev > /dev/null # pymssql
+apt-get -y install python-pyodbc
+apt-get -y install unixodbc unixodbc-dev
