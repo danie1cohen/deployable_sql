@@ -6,7 +6,7 @@ SQL views, tables, and stored procedures as if they were deployable code.
 
 Usage:
     deployable.py setup <usr> <db>
-    deployable.py <usr> <pwd> <host> <db> [options]
+    deployable.py sync <usr> <pwd> <host> <db> [options]
     deployable.py auto [options]
 
 Options:
@@ -89,7 +89,7 @@ def main():
 
     if args['--all'] or args['--views']:
         views = os.path.join('.', 'views')
-        d.sync_views(views)
+        d.sync_folder(views)
 
     if args['--filename']:
         d.sync_file(args['--filename'])

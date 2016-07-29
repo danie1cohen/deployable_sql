@@ -7,7 +7,7 @@ from subprocess import call
 
 FOLDERS = ['views', 'tables', 'functions', 'stored_procedures', 'permissions']
 
-FILES = [os.path.join('permissions', 'grant_schema.sql')]
+FILES = [os.path.join('permissions', 'grant_deployable.sql')]
 
 GRANTS = """
 USE %(db)s;
@@ -27,7 +27,7 @@ def run_setup(username, db, gitinit=True):
         if not os.path.exists(f):
             os.mkdir(f)
 
-    with open(os.path.join('permissions', 'grant_schema.sql'), 'w') as stream:
+    with open(os.path.join('permissions', 'grant_deployable.sql'), 'w') as stream:
         stream.write(GRANTS % {'user': username, 'db': db})
 
     if gitinit: #cover: no pragma

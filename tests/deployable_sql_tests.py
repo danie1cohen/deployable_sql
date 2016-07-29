@@ -44,11 +44,11 @@ class TestDeployableSql(object):
 
     @raises(NotImplementedError)
     def test_sync_file_full(self):
-        self.b.sync_file('permissions/grant_schema.sql')
+        self.b.sync_file('permissions/grant_deployable.sql')
 
     @raises(NotImplementedError)
     def test_sync_file_partial(self):
-        self.b.sync_file('grant_schema.sql')
+        self.b.sync_file('grant_deployable.sql')
 
     @raises(IllegalPathError)
     def test_sync_file_bad(self):

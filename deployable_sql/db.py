@@ -1,6 +1,7 @@
 """
 Class that interacts with the database.
 """
+# pylint: disable=abstract-method
 import os
 
 import pymssql
@@ -62,6 +63,41 @@ class BaseDeployer(object):
                         return path_mappings[clean_root](full_path)
         raise IllegalPathError
 
+    def _parse_path(self, path):
+        """
+        Breaks the path up into its important elements and returns them as a
+        tuple:
+        """
+        self.logger.debug('path: %s', path)
+
+        folder = None
+        if os.path.sep in path:
+            segs = path.split(os.path.sep)
+            if len(segs) != 2:
+                raise IllegalPathError
+            else:
+                folder, filename = segs
+        basename, ext = os.splitext(os.path.basename(path))
+        self.logger.debug('parts: (%s, %s, %s)', folder, basename, ext)
+
+        schema_dot_obj = self._schema_path(basename)
+        self.logger.debug('schema.obj: %s', schema_dot_obj)
+
+        # read sql from file
+        with open(path, 'r') as stream:
+            sql = stream.read()
+        self.logger.debug('read sql: %s', sql[:140].replace('\n', ''))
+        return schema_dot_obj, sql, folder, filename, basename
+
+    def sync_folder(self, folder):
+        """
+        Syncs all the views in a given folder (that wend with ext .sql).
+        """
+        for sql in os.listdir(folder):
+            if not sql.endswith('.sql'):
+                continue
+            self.sync_file(os.path.join(folder, sql))
+
 
 class PyMSSQLDeployer(BaseDeployer):
     """Class used to deploy source controlled SQL files to datbase"""
@@ -74,41 +110,34 @@ class PyMSSQLDeployer(BaseDeployer):
 
     def sync_view(self, path):
         """Drops the view if it already exists, then and recreates it."""
-        self.logger.debug(path)
-        self.logger.debug(os.path.splitext(os.path.basename(path)))
-        filename, _ = os.path.splitext(os.path.basename(path))
-        self.logger.debug('Syncing view: %s' % filename)
-        with open(path, 'r') as stream:
-            sql = stream.read()
-        drop_sql = self._if_drop_view(filename)
-        build_sql = self._create_view(filename, sql)
+        schema_dot_obj, sql = self._parse_path(path)[:3]
+        self.logger.debug('Syncing view: %s', schema_dot_obj)
+        drop_sql = _if_drop(schema_dot_obj)
+        # remove any ORDER BY statements
+        sql = '\n'.join([line for line in sql.split('\n')
+                         if 'ORDER BY' not in line])
+        build_sql = "CREATE VIEW %s AS \n%s;" % (schema_dot_obj, sql)
         self._exec(drop_sql)
         self._exec(build_sql)
-
-    def sync_table(self, path):
-        """Not implemented."""
-        raise NotImplementedError
+        self._exec('SELECT TOP 1 * FROM %s' % schema_dot_obj)
 
     def sync_function(self, path):
         """Syncs a function."""
-        raise NotImplementedError
-
-    def sync_permission(self, path):
-        """Syncs a permission."""
-        raise NotImplementedError
+        schema_dot_obj, sql = self._parse_path(path)[:3]
+        self.logger.debug('Syncing function: %s', schema_dot_obj)
+        drop_sql = _if_drop(schema_dot_obj, object_type='FUNCTION')
+        self._exec(drop_sql)
+        # nothing fancy required here, the sql is a create statement
+        self._exec(sql)
 
     def sync_stored_procedure(self, path):
         """Syncs a stored procedure."""
-        raise NotImplementedError
-
-    def sync_views(self, folder):
-        """
-        Syncs all the views in a given folder (that wend with ext .sql).
-        """
-        for vw in os.listdir(folder):
-            if not vw.endswith('.sql'):
-                continue
-            self.sync_view(os.path.join(folder, vw))
+        schema_dot_obj, sql = self._parse_path(path)[:3]
+        self.logger.debug('Syncing stored procedure: %s', schema_dot_obj)
+        drop_sql = _if_drop(schema_dot_obj, object_type='PROCEDURE')
+        self._exec(drop_sql)
+        # nothing fancy required here, the sql is a create statement
+        self._exec(sql)
 
     def test(self):
         """Runs a simple test select statement."""
@@ -124,7 +153,7 @@ class PyMSSQLDeployer(BaseDeployer):
         """
         Executes some sql, with a little logging.
         """
-        self.logger.debug('Executing sql:\n\n%s...\n\n' % sql[:140])
+        self.logger.debug('Executing sql:\n\n%s...\n\n' % sql[:280])
         self.cursor.execute(sql)
         try:
             rows = self.cursor.fetchall()
@@ -137,13 +166,12 @@ class PyMSSQLDeployer(BaseDeployer):
             self.logger.debug('%d rows' % i)
             return rows
 
-    def _if_drop_view(self, view):
-        """Generates sql to check for object and drop if it exists."""
-        path = self._schema_path(view)
-        sql = """IF OBJECT_ID ('%s') IS NOT NULL
-        DROP VIEW %s;""" % (path, path)
-        return sql
-
-    def _create_view(self, name, sql):
-        """Turns a sql select statement into a create view statement."""
-        return "CREATE VIEW %s AS \n%s;" % (self._schema_path(name), sql)
+def _if_drop(schema_dot_obj, object_type='VIEW'):
+    """Generates sql to check for object and drop if it exists."""
+    args = {
+        'schema_dot_obj': schema_dot_obj,
+        'object_type': object_type
+        }
+    sql = """IF OBJECT_ID ('%(schema_dot_obj)s') IS NOT NULL
+    DROP %(object_type)s %(schema_dot_obj)s;"""
+    return sql % args
