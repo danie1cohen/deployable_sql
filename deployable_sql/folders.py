@@ -41,7 +41,7 @@ def run_setup(username, db, gitinit=True):
 
     print('All set!')
 
-def create_job(jobname):
+def create_job(jobname, recurrence='weekly'):
     """
     Creates a basic job from template.
     """
@@ -56,11 +56,12 @@ def create_job(jobname):
                 ],
                 'schedules': [
                     {
-                        'frequency_type': 'weekly',
-                        'frequency_interval': 'sunday',
+                        'freq_type': 'weekly',
+                        'freq_interval': 'sunday',
+                        'freq_recurrence_factor': 1,
                         'active_start_time': '060000',
                         'active_start_date': datetime.now().strftime('%Y-%m-%d'),
-                        'schedule_name': 'weekly'
+                        'name': 'weekly'
                     }
                 ]
             }
