@@ -152,9 +152,14 @@ class PyMSSQLDeployer(BaseDeployer):
     def __init__(self, usr, pwd, host, db, **kwargs):
         """Creates an engine connection."""
         super(PyMSSQLDeployer, self).__init__(**kwargs)
+        self.db = db
         self.conn = pymssql.connect(host, usr, pwd, db)
         self.conn.autocommit(True)
         self.cursor = self.conn.cursor()
+
+    def _reset_db(self):
+        """Run a use statement on the default db."""
+        self._exec('USE %s;' % self.db)
 
     def sync_view(self, path):
         """Drops the view if it already exists, then and recreates it."""
@@ -165,6 +170,7 @@ class PyMSSQLDeployer(BaseDeployer):
         sql = '\n'.join([line for line in sql.split('\n')
                          if 'ORDER BY' not in line])
         build_sql = "CREATE VIEW %s AS \n%s;" % (schema_dot_obj, sql)
+        self._reset_db()
         self._exec(drop_sql)
         self._exec(build_sql)
         #self._exec('SELECT TOP 1 * FROM %s' % schema_dot_obj)
@@ -174,6 +180,7 @@ class PyMSSQLDeployer(BaseDeployer):
         schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing function: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj, object_type='FUNCTION')
+        self._reset_db()
         self._exec(drop_sql)
         # nothing fancy required here, the sql is a create statement
         self._exec(sql)
@@ -183,6 +190,7 @@ class PyMSSQLDeployer(BaseDeployer):
         schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing stored procedure: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj, object_type='PROCEDURE')
+        self._reset_db()
         self._exec(drop_sql)
         # nothing fancy required here, the sql is a create statement
         self._exec(sql)
