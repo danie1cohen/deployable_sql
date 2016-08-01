@@ -75,7 +75,7 @@ def create_job(jobname, recurrence='weekly'):
                 'steps': [
                     {
                         'step_name': jobname,
-                        'command': 'EXEC %s;' % jobname,
+                        'command': "N'EXEC %s;'" % jobname,
                         'database_name': 'master'
                     }
                 ],
