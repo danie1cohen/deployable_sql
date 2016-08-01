@@ -336,4 +336,4 @@ def build_exec_wparams(executable, params):
     for key, val in params.items():
         sql += delim + '\t@%s = %s' % (key, val)
         delim = ',\n'
-    return sql
+    return sql + '\n\n'
