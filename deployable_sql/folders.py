@@ -25,6 +25,14 @@ GRANT CREATE FUNCTION TO %(user)s;
 GRANT CREATE TABLE TO %(user)s;
 GRANT CREATE PROCEDURE TO %(user)s;
 
+USE msdb;
+GRANT SELECT ON SCHEMA :: dbo TO %(user)s;
+GRANT EXECUTE ON OBJECT :: dbo.sp_delete_job TO %(user)s;
+GRANT EXECUTE ON OBJECT :: dbo.sp_add_job TO %(user)s;
+GRANT EXECUTE ON OBJECT :: dbo.sp_add_jobstep TO %(user)s;
+GRANT EXECUTE ON OBJECT :: dbo.sp_add_jobschedule TO %(user)s;
+GRANT EXECUTE ON OBJECT :: dbo.sp_add_alert TO %(user)s;
+GRANT EXECUTE ON OBJECT :: dbo.sp_add_jobserver TO %(user)s;
 """
 
 def run_setup(username, db, gitinit=True):
