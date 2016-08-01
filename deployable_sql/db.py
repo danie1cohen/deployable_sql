@@ -257,10 +257,17 @@ def read_job(job):
         ('steps', format_step),
         ('schedules', format_sched),
         ('alerts', format_alert),
+        ('servers', format_server),
     ])
+
+    # there should be only one job per file but it will arrive as a list
+    assert len(job) == 1
 
     for job_name, settings in job.items():
         sql += job_template % job_name
+
+        if 'servers' not in settings.keys():
+            settings['servers'] = None
 
         for label, method in formatters.items():
             try:
@@ -317,6 +324,10 @@ def format_sched(schedule):
 def format_alert(alert):
     """Returns a SQL formatted create alert command."""
     return build_exec_wparams('sp_add_alert', alert)
+
+def format_server(server):
+    """Returns TSQL formatted command to set up a server."""
+    return build_exec_wparams('sp_add_jobserver', server)
 
 def build_exec_wparams(executable, params):
     """Returns TSQL formatted command to add an alert."""
