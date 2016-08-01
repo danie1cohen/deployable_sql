@@ -53,25 +53,33 @@ def create_job(jobname, recurrence='weekly'):
     """
     Creates a basic job from template.
     """
+    schedules = {
+        'weekly': {
+            'freq_type': 'weekly',
+            'freq_interval': 'sunday',
+            'freq_recurrence_factor': 1,
+            'active_start_time': '060000',
+            'active_start_date': datetime.now().strftime('%Y-%m-%d'),
+            'name': 'weekly'
+        },
+        'daily': {
+            'freq_type': 'daily',
+            'active_start_time': '060000',
+            'active_start_date': datetime.now().strftime('%Y-%m-%d'),
+            'name': 'daily'
+        }
+    }
     yml = {
         jobname:
             {
                 'steps': [
                     {
                         'step_name': jobname,
-                        'command': 'EXEC %s;' % jobname
+                        'command': 'EXEC %s;' % jobname,
+                        'database_name': 'master'
                     }
                 ],
-                'schedules': [
-                    {
-                        'freq_type': 'weekly',
-                        'freq_interval': 'sunday',
-                        'freq_recurrence_factor': 1,
-                        'active_start_time': '060000',
-                        'active_start_date': datetime.now().strftime('%Y-%m-%d'),
-                        'name': 'weekly'
-                    }
-                ]
+                'schedules': [schedules['recurrence']]
             }
         }
     if not os.path.exists('jobs'):

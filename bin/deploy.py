@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-"""deployable.py
+"""deploy.py
 
 This script allows you to keep SQL Scripts under source control, and manage
 SQL views, tables, and stored procedures as if they were deployable code.
 
 Usage:
-    deployable.py setup <usr> <db>
-    deployable.py sync <usr> <pwd> <host> <db> [options]
-    deployable.py auto [options]
-    deployable.py create_job <jobname>
+    deploy.py setup <usr> <db>
+    deploy.py sync <usr> <pwd> <host> <db> [options]
+    deploy.py auto [options]
+    deploy.py create_job <jobname> [--recurrence=(daily|weekly)]
 
 Options:
     -h, --help                      Show this screen.
@@ -71,7 +71,7 @@ def main():
         run_setup(args['<usr>'], args['<db>'])
         return None
     elif args['create_job']:
-        create_job(args['<jobname>'])
+        create_job(args['<jobname>'], recurrence=args['--recurrence'])
         return None
 
     logging.config.dictConfig(LOGGERS)

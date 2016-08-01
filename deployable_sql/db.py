@@ -283,12 +283,10 @@ def read_job(job):
 
 def format_step(step):
     """Returns SQL formatted add step command."""
-    sql = """EXEC sp_add_jobstep
-    @job_name = N'%(job_name)s',
-    @step_name = N'%(step_name)s',
-    @subsystem = N'TSQL',
-    @command = '%(command)s'\n\n"""
-    return sql % step
+    defaults = {
+        'subsystem': "N'TSQL'",
+        }
+    return build_exec_wparams('sp_add_jobstep', step, defaults=defaults)
 
 def format_freq_interval(fq):
     """Try to format the interval, but not too hard."""
@@ -307,21 +305,15 @@ def format_sched(schedule):
         'active_start_date': datetime.now().strftime('%Y%m%d'),
         'active_start_time': '0700'
     }
-    for key in defaults.keys():
-        try:
-            schedule[key]
-        except KeyError:
-            schedule[key] = defaults[key]
-
     validators = {
         'active_start_date': lambda x: parse(x).strftime('%Y%m%d'),
         'freq_type': lambda x: TSQL_FREQ_TYPES[x],
         'freq_interval': format_freq_interval
     }
-    for key, func in validators.items():
-        schedule[key] = func(schedule[key])
-
-    return build_exec_wparams('sp_add_jobschedule', schedule)
+    return build_exec_wparams('sp_add_jobschedule',
+                              schedule,
+                              defaults=defaults,
+                              validators=validators)
 
 def format_alert(alert):
     """Returns a SQL formatted create alert command."""
@@ -331,8 +323,18 @@ def format_server(server):
     """Returns TSQL formatted command to set up a server."""
     return build_exec_wparams('sp_add_jobserver', server)
 
-def build_exec_wparams(executable, params):
+def build_exec_wparams(executable, params, defaults=None, validators=None):
     """Returns TSQL formatted command to add an alert."""
+    if defaults is None: defaults = {}
+    if validators is None: validators = {}
+
+    for req in defaults.keys():
+        if req not in params.keys():
+            params[req] = defaults[req]
+
+    for key, func in validators.items():
+        params[key] = func(params[key])
+
     sql = 'EXEC %s' % executable
     delim = '\n'
     for key, val in params.items():
