@@ -270,12 +270,14 @@ def read_job(job):
             settings['servers'] = [{'job_name': job_name}]
 
         for label, method in formatters.items():
+
             try:
                 for attrs in settings[label]:
                     attrs['job_name'] = job_name
-                    sql += method(attrs)
+                    new_sql = method(attrs)
+                    sql += new_sql
             except KeyError:
-                pass
+                print('KeyError, no label found: %s' % label)
 
         print(sql)
         return job_name, sql
@@ -298,14 +300,6 @@ def format_freq_interval(fq):
 
 def format_sched(schedule):
     """Format the schedule values all nice, and set any missing defaults."""
-    validators = {
-        'active_start_date': lambda x: parse(x).strftime('%Y%m%d'),
-        'freq_type': lambda x: TSQL_FREQ_TYPES[x],
-        'freq_interval': format_freq_interval
-    }
-    for key, func in validators.items():
-        schedule[key] = func(schedule[key])
-
     defaults = {
         'name': 'daily',
         'freq_type': 4,
@@ -319,6 +313,15 @@ def format_sched(schedule):
             schedule[key]
         except KeyError:
             schedule[key] = defaults[key]
+
+    validators = {
+        'active_start_date': lambda x: parse(x).strftime('%Y%m%d'),
+        'freq_type': lambda x: TSQL_FREQ_TYPES[x],
+        'freq_interval': format_freq_interval
+    }
+    for key, func in validators.items():
+        schedule[key] = func(schedule[key])
+
     return build_exec_wparams('sp_add_jobschedule', schedule)
 
 def format_alert(alert):
