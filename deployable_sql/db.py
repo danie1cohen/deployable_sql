@@ -274,10 +274,9 @@ def read_job(job):
             try:
                 for attrs in settings[label]:
                     attrs['job_name'] = job_name
-                    new_sql = method(attrs)
-                    sql += new_sql
+                    sql += method(attrs)
             except KeyError:
-                print('KeyError, no label found: %s' % label)
+                pass
 
         print(sql)
         return job_name, sql

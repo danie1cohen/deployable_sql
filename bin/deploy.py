@@ -14,10 +14,12 @@ Options:
     -h, --help                      Show this screen.
     -f, --filename=<filename>       A single file to sync.
     --schema=<schema>               Specify a non-standard schema. [default: cu]
-    --all                           Rebuild everything.
-    --views                         Rebuild only views.
-    --jobs                          Rebuild the jobs folder.
     --test                          Test the connection.
+    --all                           Rebuild everything.
+    --functions                     Rebuild the functions folder.
+    --jobs                          Rebuild the jobs folder.
+    --sps                           Rebuild stored procedures.
+    --views                         Rebuild only views.
 """
 import os
 import logging
@@ -99,14 +101,18 @@ def main():
     elif args['--all']:
         d.sync_folder(views)
         d.sync_folder(jobs)
-        #d.sync_folder(functions)
-        #d.sync_folder(stored_procedures)
-    elif args['--views']:
-        d.sync_folder(views)
-    elif args['--jobs']:
-        d.sync_folder(jobs)
+        d.sync_folder(functions)
+        d.sync_folder(stored_procedures)
     elif args['--filename']:
         d.sync_file(args['--filename'])
+    elif args['--functions']:
+        d.sync_folder(functions)
+    elif args['--jobs']:
+        d.sync_folder(jobs)
+    elif args['--sps']:
+        d.sync_folder(stored_procedures)
+    elif args['--views']:
+        d.sync_folder(views)
 
 
     print('Done!')
