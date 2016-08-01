@@ -79,7 +79,7 @@ def create_job(jobname, recurrence='weekly'):
                         'database_name': 'master'
                     }
                 ],
-                'schedules': [schedules['recurrence']]
+                'schedules': [schedules[recurrence]]
             }
         }
     if not os.path.exists('jobs'):
