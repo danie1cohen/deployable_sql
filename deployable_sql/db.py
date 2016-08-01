@@ -267,7 +267,7 @@ def read_job(job):
         sql += job_template % job_name
 
         if 'servers' not in settings.keys():
-            settings['servers'] = None
+            settings['servers'] = [{'job_name': job_name}]
 
         for label, method in formatters.items():
             try:
