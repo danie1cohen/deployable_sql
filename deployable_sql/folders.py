@@ -64,6 +64,7 @@ def create_job(jobname, recurrence='weekly'):
         },
         'daily': {
             'freq_type': 'daily',
+            'freq_interval': 1,
             'active_start_time': '060000',
             'active_start_date': datetime.now().strftime('%Y-%m-%d'),
             'name': 'daily'
