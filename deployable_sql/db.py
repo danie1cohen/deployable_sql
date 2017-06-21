@@ -1,10 +1,11 @@
 """
 Class that interacts with the database.
 """
-# pylint: disable=abstract-method
-import os
-from datetime import datetime
+#pylint:disable=abstract-method,unused-argument
 from collections import OrderedDict
+from datetime import datetime
+import logging
+import os
 
 import pymssql
 from sqlalchemy import create_engine, text
@@ -39,9 +40,9 @@ TSQL_FREQ_INTS = {
 
 class BaseDeployer(object):
     """Base class for SQL Deployers."""
-    def __init__(self, schema="cu", logger=None):
+    def __init__(self, schema="cu", **kwargs):
         self.schema = schema
-        self.logger = logger
+        self.logger = logging.getLogger(__name__)
 
     def sync_function(self, path):
         """Syncs a function."""
@@ -83,7 +84,7 @@ class BaseDeployer(object):
             # if full path is provided, just decide on the right function
             segs = path.split(os.path.sep)
             if len(segs) != 2:
-                print IllegalPathError(path)
+                self.logger.warning('%s', IllegalPathError(path))
             return path_mappings[segs[0]](path)
         else:
             # if partial path is provided, find the right folder
@@ -226,7 +227,7 @@ class PyMSSQLDeployer(BaseDeployer):
         """
         Executes some sql, with a little logging.
         """
-        self.logger.debug('Executing sql:\n\n%s...\n\n' % sql[:280])
+        self.logger.debug('Executing sql:\n\n%s...\n\n', sql[:280])
         self.cursor.execute(sql)
         try:
             rows = self.cursor.fetchall()
@@ -236,7 +237,7 @@ class PyMSSQLDeployer(BaseDeployer):
             i = 0
             for i, row in enumerate(rows):
                 self.logger.debug(row)
-            self.logger.debug('%d rows' % i)
+            self.logger.debug('%d rows', i)
             return rows
 
 def _if_drop(schema_dot_obj, object_type='VIEW'):
