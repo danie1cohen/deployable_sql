@@ -14,7 +14,7 @@ from deployable_sql.folders import run_setup, FOLDERS, FILES, create_job
 from deployable_sql.db import (
     BaseDeployer, PyMSSQLDeployer, SqlAlchemyDeployer, read_job
     )
-from deployable_sql.exc import IllegalPathError
+from deployable_sql.exc import *
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -55,7 +55,7 @@ class TestDeployableSql(object):
         ok_(d)
 
     @nottest
-    def test_sqlalchemy_deployer(self):
+    def test_sqlalchemy_deployer_mssql(self):
         d = SqlAlchemyDeployer('mssql+pyodbc://svcDeployerSQL::qPU1NdiU0LFXIRgY6z5d@hosutons/ARCUSYM000')
         ok_(d.test())
 
@@ -69,8 +69,9 @@ class TestDeployableSql(object):
         run_setup('blank', 'whatever', gitinit=False)
         self.b.sync_file('grant_deployable.sql')
 
-    @raises(IllegalPathError)
+    #@raises(IllegalPathError)
     def test_sync_file_bad(self):
+        # do not fail on bad files, just log
         self.b.sync_file('no_such_file.sql')
 
     def test_read_job(self):
