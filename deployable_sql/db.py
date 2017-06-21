@@ -96,7 +96,7 @@ class BaseDeployer(object):
                         clean_root = root.split(os.path.sep)[-1]
                         full_path = os.path.join(clean_root, f)
                         return path_mappings[clean_root](full_path)
-        raise IllegalPathError(path)
+        self.logger.warning('%s', IllegalPathError(path))
 
     def _parse_path(self, path):
         """
@@ -109,7 +109,7 @@ class BaseDeployer(object):
         if os.path.sep in path:
             segs = path.split(os.path.sep)
             if len(segs) != 2:
-                raise IllegalPathError
+                self.logger.warning('%s', IllegalPathError(path))
             else:
                 folder, filename = segs
         basename, ext = os.path.splitext(os.path.basename(path))
