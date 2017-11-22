@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-"""deploy.py
+"""deploy_sql.py
 
 This script allows you to keep SQL Scripts under source control, and manage
 SQL views, tables, and stored procedures as if they were deployable code.
 
 Usage:
-    deploy.py setup <usr> <db>
-    deploy.py sync <usr> <pwd> <host> <db> [options]
-    deploy.py auto [options]
-    deploy.py create_job <jobname> [--recurrence=(daily|weekly)]
+    deploy_sql.py setup <usr> <db>
+    deploy_sql.py [options]
+    deploy_sql.py <usr> <pwd> <host> <db> [options]
+    deploy_sql.py create_job <jobname> [--recurrence=(daily|weekly)]
 
 Options:
     -h, --help                      Show this screen.
@@ -26,6 +26,7 @@ import logging
 import logging.config
 
 from docopt import docopt
+import yaml
 
 from deployable_sql.db import PyMSSQLDeployer
 from deployable_sql.folders import run_setup, create_job
@@ -61,6 +62,28 @@ LOGGERS = {
     }
 
 
+def get_credentials(args):
+    """
+    Check a config file, environment variables, or the command line arguments
+    and return credentials for the deployer.
+
+    The order of precence is same as above.
+    """
+    config_path = os.path.expanduser('~/.deploy_sql.yml')
+    if os.path.exists(config_path):
+        with open(config_path, 'rb') as stream:
+            config = yaml.load(stream)
+    else:
+        config = {}
+
+    usr = config.get('usr', os.getenv('DEPLOYABLE_USR', args['<usr>']))
+    pwd = config.get('pwd', os.getenv('DEPLOYABLE_PWD', args['<pwd>']))
+    host = config.get('host', os.getenv('DEPLOYABLE_HOST', args['<host>']))
+    db = config.get('db', os.getenv('DEPLOYABLE_DB', args['<db>']))
+
+    return usr, pwd, host, db
+
+
 def main():
     """
     Parses arguments and does the doing.
@@ -77,19 +100,12 @@ def main():
     logging.config.dictConfig(LOGGERS)
     logger = logging.getLogger(__name__)
 
-    if args['auto']:
-        usr = os.getenv('DEPLOYABLE_USR')
-        pwd = os.getenv('DEPLOYABLE_PWD')
-        host = os.getenv('DEPLOYABLE_HOST')
-        db = os.getenv('DEPLOYABLE_DB')
-        d = PyMSSQLDeployer(
-            usr, pwd, host, db, schema=args['--schema'], logger=logger
-            )
-    else:
-        d = PyMSSQLDeployer(
-            args['<usr>'], args['<pwd>'], args['<host>'], args['<db>'],
-            schema=args['--schema'], logger=logger
-            )
+    usr, pwd, host, db = get_credentials(args)
+
+    d = PyMSSQLDeployer(
+        usr, pwd, host, db, schema=args['--schema']
+    )
+
     views = os.path.join('.', 'views')
     tables = os.path.join('.', 'tables')
     functions = os.path.join('.', 'functions')

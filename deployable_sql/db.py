@@ -255,6 +255,7 @@ def read_job(job):
     Parses a job object.
     """
     sql = 'USE msdb;\n\n'
+
     job_template = """EXEC sp_add_job
     @job_name = %s,
     @notify_level_email = 3,
@@ -269,7 +270,7 @@ def read_job(job):
         ('servers', format_server),
     ])
 
-    # there should be only one job per file but it will arrive as a list
+    # there should be only one job per file but it will arrive as a dict
     assert len(job) == 1
 
     for job_name, settings in job.items():

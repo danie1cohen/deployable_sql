@@ -8,13 +8,19 @@ except ImportError:
 config = {
     'description': 'deployable_sql',
     'author': 'Dan Cohen',
-    'url': 'deltaco.usccreditunion.org',
-    'download_url': 'git.usccreditunion.org',
+    'url': 'https://git.usccreditunion.org/cu/deployable_sql',
+    'download_url': 'https://git.usccreditunion.org/cu/deployable_sql/archive/master.zip',
     'author_email': 'dcohen@usccreditunion.org',
-    'version': '0.0.36',
-    'install_requires': ['pymssql==2.1.3', 'docopt==0.6.2'],
+    'version': '1.0.0',
+    'install_requires': [
+        'pymssql==2.1.3',
+        'docopt==0.6.2',
+        'python-dateutil==2.5.3',
+        'PyYAML==3.11',
+        'SQLAlchemy==1.0.14'
+    ],
     'packages': ['deployable_sql'],
-    'scripts': ['bin/deploy.py'],
+    'scripts': ['bin/deploy_sql.py'],
     'name': 'deployable_sql'
 }
 
