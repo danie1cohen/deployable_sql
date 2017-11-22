@@ -282,7 +282,16 @@ def read_job(job):
         for label, method in formatters.items():
 
             try:
-                for attrs in settings[label]:
+                for i, attrs in enumerate(settings[label]):
+                    defaults = {}
+
+                    # for all steps that are not last, the default success
+                    # action should be to proceed to the next step
+                    if label == 'steps' and i + 1 != len(settings[label]):
+                        defaults['on_success_action'] = 3
+
+                    defaults.update(attrs)
+
                     attrs['job_name'] = job_name
                     sql += method(attrs)
             except KeyError:
@@ -295,7 +304,7 @@ def format_step(step):
     """Returns SQL formatted add step command."""
     defaults = {
         'subsystem': "N'TSQL'",
-        }
+    }
     return build_exec_wparams('sp_add_jobstep', step, defaults=defaults)
 
 def format_freq_interval(fq):
