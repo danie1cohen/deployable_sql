@@ -9,7 +9,7 @@ This project is fairly single-minded towards T-SQL at the moment.
 
 ## Usage
 
-Running `deploy.py setup <usr> <db>` will create the folder structure you need.
+Running `deploy_sql.py setup <usr> <db>` will create the folder structure you need.
 
 * functions
 * jobs
@@ -32,7 +32,7 @@ script will convert it into a CREATE VIEW statement.
 Jobs are a little bit more involved.  Instead of making you write the SQL that
 adds jobs, adds steps to the job, and adds schedules, you can define an object
 in yaml that is structured in such a way that the script will do the work. A
-quick way to do this is to invoke `deploy.py create_job <jobname>`.
+quick way to do this is to invoke `deploy_sql.py create_job <jobname>`.
 
 * permissions
 
@@ -42,7 +42,7 @@ control your tables.  We suggest that you do not use the deployer service to
 manage permissions automatically, but store the permissions as scripts and run
 them manually as needed.
 
-Then, you can start syncing away with `deploy.py --all`
+Then, you can start syncing away with `deploy_sql.py --all`
 
 ## Permissions
 
