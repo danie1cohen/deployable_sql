@@ -8,9 +8,9 @@ except ImportError:
 config = {
     'description': 'deployable_sql',
     'author': 'Dan Cohen',
-    'url': 'https://git.usccreditunion.org/cu/deployable_sql',
-    'download_url': 'https://git.usccreditunion.org/cu/deployable_sql/archive/master.zip',
-    'author_email': 'dcohen@usccreditunion.org',
+    'url': 'https://github.com/danie1cohen/deployable_sql',
+    'download_url': 'https://github.com/danie1cohen/deployable_sql/archive/master.zip',
+    'author_email': 'daniel.o.cohen@gmail.com',
     'version': '1.0.0',
     'install_requires': [
         'pymssql==2.1.3',
