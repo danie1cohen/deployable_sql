@@ -15,7 +15,9 @@ class SqlAlchemyDeployer(BaseDeployer):
     def _exec(self, sql):
         """Execute a statement."""
         result = self.engine.execute(text(sql))
-        self.logger.debug(result.fetchall())
+        rows = result.fetchall()
+        self.logger.debug(rows)
+        return rows
 
     def test(self):
         """Run a quick test to see if this even works."""
