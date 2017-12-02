@@ -7,8 +7,6 @@ before_install:
 - sudo apt-get update
 - sudo apt-get install -y freetds-dev
 script:
-- nosetests
-script:
-- coverage run nosetests
+- nosetests --with-coverage
 after_success:
 - coveralls
