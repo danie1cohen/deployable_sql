@@ -8,5 +8,5 @@ before_install:
 - sudo apt-get install -y freetds-dev
 script:
 - nosetests --with-coverage
-after_success:
+after_script:
 - coveralls
