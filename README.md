@@ -1,6 +1,8 @@
 Deployable SQL
 ==============
 
+[![Build Status](https://travis-ci.org/danie1cohen/deployable_sql.svg?branch=master)](https://travis-ci.org/danie1cohen/deployable_sql)
+
 The goal of this this module is to provide a clean command line interface for
 working with SQL views, stored procedures and jobs in a way that is versionable,
 and so providing a way to interface with typical continuous integration tools.
