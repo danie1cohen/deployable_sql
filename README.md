@@ -2,6 +2,7 @@ Deployable SQL
 ==============
 
 [![Build Status](https://travis-ci.org/danie1cohen/deployable_sql.svg?branch=master)](https://travis-ci.org/danie1cohen/deployable_sql)
+[![Coverage Status](https://coveralls.io/repos/github/danie1cohen/deployable_sql/badge.svg?branch=master)](https://coveralls.io/github/danie1cohen/deployable_sql?branch=master)
 
 The goal of this this module is to provide a clean command line interface for
 working with SQL views, stored procedures and jobs in a way that is versionable,
