@@ -44,27 +44,27 @@ class BaseDeployer(object):
         self.schema = schema
         self.logger = logging.getLogger(__name__)
 
-    def sync_function(self, path):
+    def sync_function(self, path): # pragma: no cover
         """Syncs a function."""
         raise NotImplementedError
 
-    def sync_permission(self, path):
+    def sync_permission(self, path): # pragma: no cover
         """Syncs a permission."""
         raise NotImplementedError
 
-    def sync_stored_procedure(self, path):
+    def sync_stored_procedure(self, path): # pragma: no cover
         """Syncs an SP."""
         raise NotImplementedError
 
-    def sync_table(self, path):
+    def sync_table(self, path): # pragma: no cover
         """Syncs a table."""
         raise NotImplementedError
 
-    def sync_view(self, path):
+    def sync_view(self, path): # pragma: no cover
         """Syncs a view."""
         raise NotImplementedError
 
-    def sync_job(self, path):
+    def sync_job(self, path): # pragma: no cover
         """Syncs a job, step, schedule."""
         raise NotImplementedError
 

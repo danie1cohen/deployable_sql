@@ -13,8 +13,9 @@ from nose.tools import *
 from deployable_sql.folders import run_setup, FOLDERS, FILES, create_job
 from deployable_sql.db import (
     BaseDeployer, PyMSSQLDeployer, SqlAlchemyDeployer, read_job
-    )
+)
 from deployable_sql.exc import *
+from deployable_sql.central import *
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -53,11 +54,6 @@ class TestDeployableSql(object):
     def test_sqlalchemy_deployer(self):
         d = SqlAlchemyDeployer('sqlite://')
         ok_(d)
-
-    @nottest
-    def test_sqlalchemy_deployer_mssql(self):
-        d = SqlAlchemyDeployer('mssql+pyodbc://svcDeployerSQL::qPU1NdiU0LFXIRgY6z5d@hosutons/ARCUSYM000')
-        ok_(d.test())
 
     @raises(NotImplementedError)
     def test_sync_file_full(self):

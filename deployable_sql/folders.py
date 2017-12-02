@@ -44,7 +44,7 @@ def run_setup(username, db, gitinit=True):
     with open(os.path.join('permissions', 'grant_deployable.sql'), 'w') as stream:
         stream.write(GRANTS % {'user': username, 'db': db})
 
-    if gitinit: #cover: no pragma
+    if gitinit: # pragma: no cover
         call('git init', shell=True)
 
     print('All set!')
