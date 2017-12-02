@@ -4,8 +4,6 @@ Base class for deployer objects.
 import logging
 import os
 
-from deployable_sql.exc import IllegalPathError
-
 
 class BaseDeployer(object):
     """Base class for SQL Deployers."""
@@ -50,8 +48,10 @@ class BaseDeployer(object):
             'views': self.sync_view,
             'jobs': self.sync_job,
         }
-        dirname, path = self._detect_path(name_or_path)
-        return path_mappings[dirname](path)
+        path_parts = self._detect_path(name_or_path)
+        if path_parts:
+            dirname, path = path_parts
+            return path_mappings[dirname](path)
 
     def _schema_path(self, name):
         """
