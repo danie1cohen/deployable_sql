@@ -37,36 +37,46 @@ class BaseDeployer(object):
         """Syncs a job, step, schedule."""
         raise NotImplementedError
 
-    def sync_file(self, path):
-        """Syncs a file of not yet determined type."""
+    def sync_file(self, name_or_path):
+        """
+        Syncs a file of not yet determined type.
+        """
         path_mappings = {
             'functions': self.sync_function,
             'permissions': self.sync_permission,
             'stored_procedures': self.sync_stored_procedure,
+            'sps': self.sync_stored_procedure,
             'tables': self.sync_table,
             'views': self.sync_view,
             'jobs': self.sync_job,
-
         }
-        if os.path.sep in path:
-            if path.startswith('.' + os.path.sep):
-                path = path.split(os.path.sep, 1)[-1]
-            # if full path is provided, just decide on the right function
-            segs = path.split(os.path.sep)
-            if len(segs) != 2:
-                self.logger.warning('%s', IllegalPathError(path))
-            return path_mappings[segs[0]](path)
+        dirname, path = self._detect_path(name_or_path)
+        return path_mappings[dirname](path)
+
+    def _detect_path(self, name_or_path):
+        """
+        Return the path for a given input, which may be a filename, a filename
+        relative to the source directory, or a full path.
+        """
+        full_path = None
+
+        if os.path.exists(name_or_path):
+            # handle full path or relative path by setting to absolute path
+            full_path = os.path.abspath(name_or_path)
         else:
             # if partial path is provided, find the right folder
             for root, _, files in os.walk('.'):
                 if '.git' in root:
                     continue
                 for f in files:
-                    if path == f:
+                    if name_or_path == f:
                         clean_root = root.split(os.path.sep)[-1]
                         full_path = os.path.join(clean_root, f)
-                        return path_mappings[clean_root](full_path)
-        self.logger.warning('%s', IllegalPathError(path))
+
+        if not os.path.exists(full_path):
+            self.logger.warning('Could not find path for "%s"', name_or_path)
+        else:
+            return os.path.dirname(full_path), full_path
 
     def _parse_path(self, path):
         """
