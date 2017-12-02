@@ -5,3 +5,7 @@ python:
 - pypy
 script:
 - nosetests
+script:
+  - coverage run nosetests
+after_success:
+  - coveralls
