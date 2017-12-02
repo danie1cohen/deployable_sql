@@ -53,6 +53,12 @@ class BaseDeployer(object):
         dirname, path = self._detect_path(name_or_path)
         return path_mappings[dirname](path)
 
+    def _schema_path(self, name):
+        """
+        Return the name with the default schema path dot separated.
+        """
+        return name
+
     def _detect_path(self, name_or_path):
         """
         Return the path for a given input, which may be a filename, a filename
@@ -85,14 +91,9 @@ class BaseDeployer(object):
         """
         self.logger.debug('path: %s', path)
 
-        folder = None
-        if os.path.sep in path:
-            segs = path.split(os.path.sep)
-            if len(segs) != 2:
-                self.logger.warning('%s', IllegalPathError(path))
-            else:
-                folder, filename = segs
-        basename, ext = os.path.splitext(os.path.basename(path))
+        filename = os.path.basename(path)
+        basename, ext = os.path.splitext(filename)
+        folder = os.path.dirname(path)
         self.logger.debug('parts: (%s, %s, %s)', folder, basename, ext)
 
         schema_dot_obj = self._schema_path(basename)
@@ -101,6 +102,7 @@ class BaseDeployer(object):
         # read sql from file
         with open(path, 'r') as stream:
             sql = stream.read()
+
         self.logger.debug('read sql: %s', sql[:140].replace('\n', ''))
         return schema_dot_obj, sql, folder, filename, basename
 
