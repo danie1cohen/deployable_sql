@@ -9,16 +9,13 @@ import os
 
 from nose.tools import *
 
-
 from deployable_sql.folders import run_setup, FOLDERS, FILES, create_job
-from deployable_sql.db import (
-    BaseDeployer, PyMSSQLDeployer, SqlAlchemyDeployer, read_job
-)
+from deployable_sql.deployers.base import BaseDeployer
+from deployable_sql.deployers.pymssql import PyMSSQLDeployer, read_job
+from deployable_sql.deployers.sqlalchemy import SqlAlchemyDeployer
 from deployable_sql.exc import *
 from deployable_sql.central import *
 
-
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 class TestDeployableSql(object):
     def setup(self):
