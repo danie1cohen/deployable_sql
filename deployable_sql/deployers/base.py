@@ -64,7 +64,7 @@ class BaseDeployer(object):
         Return the path for a given input, which may be a filename, a filename
         relative to the source directory, or a full path.
         """
-        full_path = None
+        full_path = ''
 
         if os.path.exists(name_or_path):
             # handle full path or relative path by setting to absolute path
