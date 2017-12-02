@@ -3,9 +3,12 @@ python:
 - '2.7'
 - '3.3'
 - pypy
+before_install:
+- sudo apt-get update
+- sudo apt-get install -y freetds-dev
 script:
 - nosetests
 script:
-  - coverage run nosetests
+- coverage run nosetests
 after_success:
-  - coveralls
+- coveralls
