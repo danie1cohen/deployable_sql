@@ -10,7 +10,7 @@ import yaml
 
 FOLDERS = [
     'views', 'tables', 'functions', 'stored_procedures', 'permissions', 'jobs'
-    ]
+]
 
 FILES = [os.path.join('permissions', 'grant_deployable.sql')]
 
@@ -71,20 +71,19 @@ def create_job(jobname, recurrence='weekly'):
         }
     }
     yml = {
-        jobname:
-            {
-                'steps': [
-                    {
-                        'step_name': jobname,
-                        'command': "N'EXEC %s;'" % jobname,
-                        'database_name': 'master'
-                    }
-                ],
-                'schedules': [schedules[recurrence]]
-            }
+        jobname: {
+            'steps': [{
+                'step_name': jobname,
+                'command': "N'EXEC %s;'" % jobname,
+                'database_name': 'master'
+            }],
+            'schedules': [schedules[recurrence]]
         }
+    }
     if not os.path.exists('jobs'):
         os.mkdir('jobs')
+
     with open(os.path.join('jobs', jobname + '.yml'), 'w') as stream:
         stream.write(yaml.dump(yml, default_flow_style=False))
+
     return yml
