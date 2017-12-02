@@ -15,7 +15,10 @@ from deployable_sql.deployers.pymssql import PyMSSQLDeployer, read_job
 class TestPyMSSQLDeployer(TestDeployableSql):
     def setup(self):
         super(TestPyMSSQLDeployer, self).setup()
-        # self.d = PyMSSQLDeployer('user', 'pwd', 'host', 'db')
+        self.d = PyMSSQLDeployer('user', 'pwd', 'host', 'db')
+
+    def teardown(self):
+        super(TestPyMSSQLDeployer, self).teardown()
 
     def test_read_job(self):
         print(self.job)

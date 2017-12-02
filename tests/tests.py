@@ -28,6 +28,8 @@ class TestDeployableSql(object):
                 os.remove(f)
         for f in FOLDERS:
             if os.path.exists(f):
+                for filename in os.listdir(f):
+                    os.remove(os.path.join(f, filename))
                 os.rmdir(f)
 
     def test_folders(self):

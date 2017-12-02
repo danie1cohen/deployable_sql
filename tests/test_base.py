@@ -21,10 +21,6 @@ class TestBaseDeployer(TestDeployableSql):
 
     def teardown(self):
         super(TestBaseDeployer, self).teardown()
-        if os.path.exists('views/test.sql'):
-            os.remove('views/test.sql')
-        if os.path.exists('views'):
-            os.rmdir('views')
 
     def test_base_deployer(self):
         assert self.d

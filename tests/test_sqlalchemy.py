@@ -17,6 +17,9 @@ class TestSqlAlchemyDeployer(TestDeployableSql):
         super(TestSqlAlchemyDeployer, self).setup()
         self.d = SqlAlchemyDeployer('sqlite://')
 
+    def teardown(self):
+        super(TestSqlAlchemyDeployer, self).teardown()
+
     def test_sqlalchemy_deployer(self):
         ok_(self.d)
 
