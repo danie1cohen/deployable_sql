@@ -133,6 +133,7 @@ class BaseDeployer(object):
         for sql in os.listdir(folder):
             self.sync_file(os.path.join(folder, sql))
 
+
 class SqlAlchemyDeployer(BaseDeployer):
     """A deployer that uses sql alchemy conn strings."""
     def __init__(self, conn_string, **kwargs):

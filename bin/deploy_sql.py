@@ -130,7 +130,6 @@ def main():
     elif args['--views']:
         d.sync_folder(views)
 
-
     print('Done!')
 
 
