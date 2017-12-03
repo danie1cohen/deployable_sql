@@ -37,8 +37,16 @@ class PyMSSQLDeployer(BaseDeployer):
     def __init__(self, usr, pwd, host, db, **kwargs):
         """Creates an engine connection."""
         super(PyMSSQLDeployer, self).__init__(**kwargs)
+        self.usr = usr
+        self.pwd = pwd
+        self.host = host
         self.db = db
-        self.conn = pymssql.connect(host, usr, pwd, db)
+        self.conn = None
+        self.cursor = None
+
+    def connect(self):
+        """Create a connection."""
+        self.conn = pymssql.connect(self.host, self.usr, self.pwd, self.db)
         self.conn.autocommit(True)
         self.cursor = self.conn.cursor()
 
@@ -112,6 +120,9 @@ class PyMSSQLDeployer(BaseDeployer):
         Executes some sql, with a little logging.
         """
         self.logger.debug('Executing sql:\n\n%s...\n\n', sql[:280])
+        if self.conn in None:
+            self.connect()
+
         self.cursor.execute(sql)
         try:
             rows = self.cursor.fetchall()
