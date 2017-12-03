@@ -23,6 +23,7 @@ class TestSqlAlchemyDeployer(TestDeployableSql):
     def test_sqlalchemy_deployer(self):
         ok_(self.d)
 
+    @nottest
     def test_test(self):
         rows = self.d.test()
         ok_(rows)
