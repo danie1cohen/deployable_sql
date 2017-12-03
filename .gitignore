@@ -28,6 +28,8 @@ dist
 # conf
 settings.py
 settings.p
+Dockerfile
+docker-compose.yml
 
 
 # static
