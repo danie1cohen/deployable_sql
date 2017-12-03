@@ -82,7 +82,7 @@ class BaseDeployer(object):
         if not os.path.exists(full_path):
             self.logger.warning('Could not find path for "%s"', name_or_path)
         else:
-            return os.path.dirname(full_path), full_path
+            return os.path.basename(os.path.dirname(full_path)), full_path
 
     def _parse_path(self, path):
         """
