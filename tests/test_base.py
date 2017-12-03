@@ -10,7 +10,7 @@ import os
 from nose.tools import *
 
 from .tests import TestDeployableSql
-from deployable_sql.deployers.base import BaseDeployer
+from deployable_sql.deployers.base_deployer import BaseDeployer
 from deployable_sql.folders import run_setup
 
 

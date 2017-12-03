@@ -9,7 +9,7 @@ from __future__ import print_function
 from nose.tools import *
 
 from .tests import TestDeployableSql
-from deployable_sql.deployers.sqlalchemy import SqlAlchemyDeployer
+from deployable_sql.deployers.sqlalchemy_deployer import SqlAlchemyDeployer
 
 
 class TestSqlAlchemyDeployer(TestDeployableSql):

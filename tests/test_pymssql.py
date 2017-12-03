@@ -9,7 +9,7 @@ from __future__ import print_function
 from nose.tools import *
 
 from .tests import TestDeployableSql
-from deployable_sql.deployers.pymssql import PyMSSQLDeployer, read_job
+from deployable_sql.deployers.pymssql_deployer import PyMSSQLDeployer, read_job
 
 
 class TestPyMSSQLDeployer(TestDeployableSql):
