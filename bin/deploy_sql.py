@@ -98,7 +98,6 @@ def main():
         return None
 
     logging.config.dictConfig(LOGGERS)
-    logger = logging.getLogger(__name__)
 
     usr, pwd, host, db = get_credentials(args)
 
