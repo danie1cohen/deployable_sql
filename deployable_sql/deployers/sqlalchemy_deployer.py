@@ -3,7 +3,7 @@ Deployer that uses sqlalchemy connection strings
 """
 from sqlalchemy import create_engine, text
 
-from .base import BaseDeployer
+from .base_deployer import BaseDeployer
 
 
 class SqlAlchemyDeployer(BaseDeployer):

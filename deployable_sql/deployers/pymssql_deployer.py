@@ -8,7 +8,7 @@ from dateutil.parser import parse
 import pymssql
 import yaml
 
-from .base import BaseDeployer
+from .base_deployer import BaseDeployer
 
 
 TSQL_FREQ_TYPES = {
