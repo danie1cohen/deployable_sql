@@ -59,6 +59,7 @@ Environment variables should be:
 * DEPLOYABLE_PWD
 * DEPLOYABLE_HOST
 * DEPLOYABLE_DB
+* DEPLOYABLE_DEFAULT_SCHEMA
 
 Or create a the yaml config like so:
 
@@ -68,3 +69,4 @@ Or create a the yaml config like so:
     pwd: yourpass
     host: yourhost
     db: yourdb
+    default_schema: yourschema

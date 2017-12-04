@@ -7,7 +7,7 @@ import os
 
 class BaseDeployer(object):
     """Base class for SQL Deployers."""
-    def __init__(self, schema="cu"):
+    def __init__(self, schema="dbo"):
         self.schema = schema
         self.logger = logging.getLogger(__name__)
 

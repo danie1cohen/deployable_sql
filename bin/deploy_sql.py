@@ -13,7 +13,7 @@ Usage:
 Options:
     -h, --help                      Show this screen.
     -f, --filename=<filename>       A single file to sync.
-    --schema=<schema>               Specify a non-standard schema. [default: cu]
+    --schema=<schema>               Specify a non-standard schema. [default: dbo]
     --test                          Test the connection.
     --all                           Rebuild everything.
     --functions                     Rebuild the functions folder.
@@ -80,8 +80,10 @@ def get_credentials(args):
     pwd = config.get('pwd', os.getenv('DEPLOYABLE_PWD', args['<pwd>']))
     host = config.get('host', os.getenv('DEPLOYABLE_HOST', args['<host>']))
     db = config.get('db', os.getenv('DEPLOYABLE_DB', args['<db>']))
+    schema = config.get('default_schema',
+                        os.getenv('DEPLOYABLE_DEFAULT_SCHEMA', args['--schema']))
 
-    return usr, pwd, host, db
+    return usr, pwd, host, db, schema
 
 
 def main():
@@ -99,10 +101,10 @@ def main():
 
     logging.config.dictConfig(LOGGERS)
 
-    usr, pwd, host, db = get_credentials(args)
+    usr, pwd, host, db, schema = get_credentials(args)
 
     d = PyMSSQLDeployer(
-        usr, pwd, host, db, schema=args['--schema']
+        usr, pwd, host, db, schema=schema
     )
 
     views = os.path.join('.', 'views')
