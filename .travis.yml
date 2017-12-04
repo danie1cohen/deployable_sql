@@ -6,7 +6,9 @@ python:
 before_install:
 - sudo apt-get update
 - sudo apt-get install -y freetds-dev
+- sudo pip install --upgrade setuptools
+- sudo apt-get install libffi-dev libssl-dev
 script:
-- nosetests --with-coverage
+- nosetests
 after_script:
 - coveralls
