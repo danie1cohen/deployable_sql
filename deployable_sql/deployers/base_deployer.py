@@ -51,7 +51,10 @@ class BaseDeployer(object):
         path_parts = self._detect_path(name_or_path)
         if path_parts:
             dirname, path = path_parts
-            return path_mappings[dirname](path)
+            try:
+                return path_mappings[dirname](path)
+            except KeyError:
+                self.logger.warning('Could not find path for "%s"', name_or_path)
 
     def _schema_path(self, name):
         """
