@@ -54,7 +54,7 @@ class BaseDeployer(object):
             try:
                 return path_mappings[dirname](path)
             except KeyError:
-                self.logger.warning('Could not find path for "%s"', name_or_path)
+                self.logger.warning('Could not find a sync function for "%s"', name_or_path)
 
     def _schema_path(self, name):
         """
