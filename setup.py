@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
-    from distutils.core import setup
+    from distutils.core import setup, find_packages
 
 config = {
     'description': 'deployable_sql',
@@ -18,7 +18,7 @@ config = {
         'python-dateutil==2.5.3',
         'PyYAML==3.11'
     ],
-    'packages': ['deployable_sql'],
+    'packages': find_packages(),
     'scripts': ['bin/deploy_sql.py'],
     'name': 'deployable_sql'
 }
