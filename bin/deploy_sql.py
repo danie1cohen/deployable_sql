@@ -28,8 +28,7 @@ import logging.config
 from docopt import docopt
 import yaml
 
-from deployable_sql.deployers.pymssql_deployer import PyMSSQLDeployer
-from deployable_sql.folders import run_setup, create_job
+from deployable_sql import PyMSSQLDeployer, run_setup, create_job
 
 
 LOGGERS = {

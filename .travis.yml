@@ -10,5 +10,6 @@ before_install:
 - sudo apt-get install -y libffi-dev libssl-dev
 script:
 - nosetests
+- deploy_sql.py --help
 after_script:
 - coveralls

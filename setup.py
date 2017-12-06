@@ -16,8 +16,7 @@ config = {
         'pymssql==2.1.3',
         'docopt==0.6.2',
         'python-dateutil==2.5.3',
-        'PyYAML==3.11',
-        'SQLAlchemy==1.0.14'
+        'PyYAML==3.11'
     ],
     'packages': ['deployable_sql'],
     'scripts': ['bin/deploy_sql.py'],
