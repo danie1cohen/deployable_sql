@@ -120,7 +120,7 @@ class PyMSSQLDeployer(BaseDeployer):
         Executes some sql, with a little logging.
         """
         self.logger.debug('Executing sql:\n\n%s...\n\n', sql[:280])
-        if self.conn in None:
+        if self.conn is None:
             self.connect()
 
         self.cursor.execute(sql)
