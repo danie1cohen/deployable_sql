@@ -105,6 +105,10 @@ class PyMSSQLDeployer(BaseDeployer):
         self._exec(drop_sql)
         self._exec(build_sql)
 
+    def sync_permission(self, path):
+        """Ignore."""
+        self.logger.warning('Ignoring "%s". U do it!', path)
+
     def test(self):
         """Runs a simple test select statement."""
         self._exec('SELECT * FROM INFORMATION_SCHEMA.TABLES')
