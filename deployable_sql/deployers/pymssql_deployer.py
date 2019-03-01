@@ -201,11 +201,11 @@ def read_job(job):
 
                     on_success_action = attrs.get('on_success_action')
                     if isinstance(on_success_action, str):
-                        attrs['on_success_action'] = consants.JOB_STEP_ACTIONS[on_success_action]
+                        attrs['on_success_action'] = constants.JOB_STEP_ACTIONS[on_success_action]
 
                     on_failure_action = attrs.get('on_failure_action')
                     if isinstance(on_failure_action, str):
-                        attrs['on_failure_action'] = consants.JOB_STEP_ACTIONS[on_failure_action]
+                        attrs['on_failure_action'] = constants.JOB_STEP_ACTIONS[on_failure_action]
 
                 defaults.update(attrs)
 
