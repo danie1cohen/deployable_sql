@@ -9,33 +9,17 @@ import pymssql
 import yaml
 
 from .base_deployer import BaseDeployer
-
-
-TSQL_FREQ_TYPES = {
-    'once': 1,
-    'daily': 4,
-    'weekly': 8,
-    'monthly': 16,
-    'monthly_relative': 32,
-    'on_agent_start': 64,
-    'idle': 128
-}
-
-TSQL_FREQ_INTS = {
-    'sunday': 1,
-    'monday': 2,
-    'tuesday': 4,
-    'wednesday': 8,
-    'thursday': 16,
-    'friday': 32,
-    'saturday': 64
-}
+from . import constants
 
 
 class PyMSSQLDeployer(BaseDeployer):
-    """Class used to deploy source controlled SQL files to datbase"""
+    """
+    Class used to deploy source controlled SQL files to datbase.
+    """
     def __init__(self, usr, pwd, host, db, **kwargs):
-        """Creates an engine connection."""
+        """
+        Prepare to create an engine connection.
+        """
         super(PyMSSQLDeployer, self).__init__(**kwargs)
         self.usr = usr
         self.pwd = pwd
@@ -45,20 +29,27 @@ class PyMSSQLDeployer(BaseDeployer):
         self.cursor = None
 
     def connect(self):
-        """Create a connection."""
+        """
+        Create a connection.
+        """
         self.conn = pymssql.connect(self.host, self.usr, self.pwd, self.db)
         self.conn.autocommit(True)
         self.cursor = self.conn.cursor()
 
     def _reset_db(self):
-        """Run a use statement on the default db."""
+        """
+        Run a use statement on the default db.
+        """
         self._exec('USE %s;' % self.db)
 
     def sync_view(self, path):
-        """Drops the view if it already exists, then and recreates it."""
+        """
+        Drops the view if it already exists, then and recreates it.
+        """
         schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing view: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj)
+
         # remove any ORDER BY statements
         sql = '\n'.join([line for line in sql.split('\n')
                          if 'ORDER BY' not in line])
@@ -69,7 +60,9 @@ class PyMSSQLDeployer(BaseDeployer):
         #self._exec('SELECT TOP 1 * FROM %s' % schema_dot_obj)
 
     def sync_function(self, path):
-        """Syncs a function."""
+        """
+        Syncs a function.
+        """
         schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing function: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj, object_type='FUNCTION')
@@ -79,7 +72,9 @@ class PyMSSQLDeployer(BaseDeployer):
         self._exec(sql)
 
     def sync_stored_procedure(self, path):
-        """Syncs a stored procedure."""
+        """
+        Syncs a stored procedure.
+        """
         schema_dot_obj, sql = self._parse_path(path)[:2]
         self.logger.debug('Syncing stored procedure: %s', schema_dot_obj)
         drop_sql = _if_drop(schema_dot_obj, object_type='PROCEDURE')
@@ -106,7 +101,9 @@ class PyMSSQLDeployer(BaseDeployer):
         self._exec(build_sql)
 
     def test(self):
-        """Runs a simple test select statement."""
+        """
+        Runs a simple test select statement.
+        """
         self._exec('SELECT * FROM INFORMATION_SCHEMA.TABLES')
 
     def _schema_path(self, name):
@@ -136,7 +133,9 @@ class PyMSSQLDeployer(BaseDeployer):
             return rows
 
 def _if_drop(schema_dot_obj, object_type='VIEW'):
-    """Generates sql to check for object and drop if it exists."""
+    """
+    Generates sql to check for object and drop if it exists.
+    """
     args = {
         'schema_dot_obj': schema_dot_obj,
         'object_type': object_type
@@ -183,7 +182,7 @@ def read_job(job):
                     # for all steps that are not last, the default success
                     # action should be to proceed to the next step
                     if label == 'steps' and i + 1 != len(settings[label]):
-                        defaults['on_success_action'] = 3
+                        defaults['on_success_action'] = constants.job_step_actions.GO_TO_NEXT_STEP
 
                     defaults.update(attrs)
 
@@ -196,21 +195,27 @@ def read_job(job):
         return job_name, sql
 
 def format_step(step):
-    """Returns SQL formatted add step command."""
+    """
+    Returns SQL formatted add step command.
+    """
     defaults = {
         'subsystem': "N'TSQL'",
     }
     return build_exec_wparams('sp_add_jobstep', step, defaults=defaults)
 
 def format_freq_interval(fq):
-    """Try to format the interval, but not too hard."""
+    """
+    Try to format the interval, but not too hard.
+    """
     try:
-        return TSQL_FREQ_INTS[fq]
+        return constants.FREQUENCY_INTERVALS[fq]
     except KeyError:
         return fq
 
 def format_sched(schedule):
-    """Format the schedule values all nice, and set any missing defaults."""
+    """
+    Format the schedule values all nice, and set any missing defaults.
+    """
     defaults = {
         'name': 'daily',
         'freq_type': 4,
@@ -221,7 +226,7 @@ def format_sched(schedule):
     }
     validators = {
         'active_start_date': lambda x: parse(x).strftime('%Y%m%d'),
-        'freq_type': lambda x: TSQL_FREQ_TYPES[x],
+        'freq_type': lambda x: constants.FREQUENCY_TYPES[x],
         'freq_interval': format_freq_interval
     }
     return build_exec_wparams('sp_add_jobschedule',
@@ -230,15 +235,21 @@ def format_sched(schedule):
                               validators=validators)
 
 def format_alert(alert):
-    """Returns a SQL formatted create alert command."""
+    """
+    Returns a SQL formatted create alert command.
+    """
     return build_exec_wparams('sp_add_alert', alert)
 
 def format_server(server):
-    """Returns TSQL formatted command to set up a server."""
+    """
+    Returns TSQL formatted command to set up a server.
+    """
     return build_exec_wparams('sp_add_jobserver', server)
 
 def build_exec_wparams(executable, params, defaults=None, validators=None):
-    """Returns TSQL formatted command to add an alert."""
+    """
+    Returns TSQL formatted command to add an alert.
+    """
     if defaults is None: defaults = {}
     if validators is None: validators = {}
 
