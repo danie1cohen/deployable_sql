@@ -197,7 +197,7 @@ def read_job(job):
                     if i + 1 == total_steps:
                         defaults['on_success_action'] = constants.job_step_actions.QUIT_WITH_SUCCESS
                     else:
-                        defaults['on_success_action'] = constants.job_step_actions.JOB_STEP_ACTIONS
+                        defaults['on_success_action'] = constants.job_step_actions.GO_TO_NEXT_STEP
 
                     on_success_action = attrs.get('on_success_action')
                     if isinstance(on_success_action, str):
