@@ -1,5 +1,6 @@
 from . import frequency_types
 from . import frequency_intervals
+from . import job_step_actions
 
 
 FREQUENCY_TYPES = {
@@ -20,4 +21,11 @@ FREQUENCY_INTERVALS = {
     'thursday': frequency_intervals.THURSDAY,
     'friday': frequency_intervals.FRIDAY,
     'saturday': frequency_intervals.SATURDAY,
+}
+
+JOB_STEP_ACTIONS = {
+    'quit_with_success': job_step_actions.QUIT_WITH_SUCCESS,
+    'quit_with_failure': job_step_actions.QUIT_WITH_FAILURE,
+    'go_to_next_step': job_step_actions.GO_TO_NEXT_STEP,
+    'go_to_step_id': job_step_actions.GO_TO_STEP_ID,
 }

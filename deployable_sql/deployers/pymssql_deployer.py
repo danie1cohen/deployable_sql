@@ -90,13 +90,16 @@ class PyMSSQLDeployer(BaseDeployer):
         """
         with open(path, 'rb') as stream:
             job = yaml.load(stream)
+
         job_name, build_sql = read_job(job)
+
         drop_sql = """DECLARE @job_id binary(16);
         SELECT @job_id = job_id FROM msdb.dbo.sysjobs WHERE name = '%s'
         IF (@job_id IS NOT NULL)
         BEGIN
             EXEC msdb.dbo.sp_delete_job @job_id
         END""" % job_name
+
         self._exec(drop_sql)
         self._exec(build_sql)
 
@@ -175,23 +178,36 @@ def read_job(job):
 
         for label, method in formatters.items():
 
-            try:
-                for i, attrs in enumerate(settings[label]):
-                    defaults = {}
+            attribute_list = settings.get(label, [])
 
-                    # for all steps that are not last, the default success
-                    # action should be to proceed to the next step
-                    if label == 'steps' and i + 1 != len(settings[label]):
-                        defaults['on_success_action'] = constants.job_step_actions.GO_TO_NEXT_STEP
+            for i, attrs in enumerate(attribute_list):
+                defaults = {}
 
-                    defaults.update(attrs)
+                # for all steps that are not last, the default success
+                # action should be to proceed to the next step
+                if label == 'steps':
+                    total_steps = len(attribute_list)
 
-                    attrs['job_name'] = job_name
-                    sql += method(attrs)
-            except KeyError:
-                pass
+                    defaults['on_failure_action'] = constants.job_step_actions.QUIT_WITH_FAILURE
 
-        print(sql)
+                    if i + 1 == total_steps:
+                        defaults['on_success_action'] = constants.job_step_actions.QUIT_WITH_SUCCESS
+                    else:
+                        defaults['on_success_action'] = constants.job_step_actions.JOB_STEP_ACTIONS
+
+                    on_success_action = attrs.get('on_success_action')
+                    if isinstance(on_success_action, str):
+                        attrs['on_success_action'] = consants.JOB_STEP_ACTIONS[on_success_action]
+
+                    on_failure_action = attrs.get('on_failure_action')
+                    if isinstance(on_failure_action, str):
+                        attrs['on_failure_action'] = consants.JOB_STEP_ACTIONS[on_failure_action]
+
+                defaults.update(attrs)
+
+                attrs['job_name'] = job_name
+                sql += method(defaults)
+
         return job_name, sql
 
 def format_step(step):

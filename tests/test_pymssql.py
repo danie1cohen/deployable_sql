@@ -16,6 +16,28 @@ class TestPyMSSQLDeployer(TestDeployableSql):
     def setup(self):
         super(TestPyMSSQLDeployer, self).setup()
         self.d = PyMSSQLDeployer('user', 'pwd', 'host', 'db')
+        self.job = {
+            'testjob': {
+                'steps': [
+                    {
+                        'database_name': 'master',
+                        'command': "N'EXEC testjob;'",
+                        'step_name': 'testjob'
+                    }
+                ],
+                'schedules': [
+                    {
+                        'freq_recurrence_factor': 1,
+                        'name': 'weekly',
+                        'freq_interval': 'sunday',
+                        'active_start_time': '060000',
+                        'freq_type': 'weekly',
+                        'active_start_date': '2019-03-01'
+                    }
+                ]
+            }
+        }
+
 
     def teardown(self):
         super(TestPyMSSQLDeployer, self).teardown()
@@ -34,5 +56,8 @@ class TestPyMSSQLDeployer(TestDeployableSql):
             'name': 'once',
             }
         self.job['testjob']['schedules'].append(second_sched)
+        print('job', self.job)
         _, sql = read_job(self.job)
         eq_(sql.count('sp_add_jobschedule'), 2)
+        print('sql', sql)
+        assert '@on_failure_action = 2' in sql

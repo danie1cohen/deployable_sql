@@ -23,9 +23,11 @@ class TestDeployableSql(object):
         print('TEAR DOWN!')
         if os.path.exists(os.path.join('jobs', 'testjob.yml')):
             os.remove(os.path.join('jobs', 'testjob.yml'))
+
         for f in FILES:
             if os.path.exists(f):
                 os.remove(f)
+                
         for f in FOLDERS:
             if os.path.exists(f):
                 for filename in os.listdir(f):
