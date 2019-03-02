@@ -192,7 +192,7 @@ def read_job(job):
                 if label == 'steps':
                     total_steps = len(attribute_list)
 
-                    defaults['on_failure_action'] = constants.job_step_actions.QUIT_WITH_FAILURE
+                    defaults['on_fail_action'] = constants.job_step_actions.QUIT_WITH_FAILURE
 
                     if i + 1 == total_steps:
                         defaults['on_success_action'] = constants.job_step_actions.QUIT_WITH_SUCCESS
@@ -203,9 +203,9 @@ def read_job(job):
                     if isinstance(on_success_action, str):
                         attrs['on_success_action'] = constants.JOB_STEP_ACTIONS[on_success_action]
 
-                    on_failure_action = attrs.get('on_failure_action')
-                    if isinstance(on_failure_action, str):
-                        attrs['on_failure_action'] = constants.JOB_STEP_ACTIONS[on_failure_action]
+                    on_fail_action = attrs.get('on_fail_action')
+                    if isinstance(on_fail_action, str):
+                        attrs['on_fail_action'] = constants.JOB_STEP_ACTIONS[on_fail_action]
 
                 defaults.update(attrs)
 
