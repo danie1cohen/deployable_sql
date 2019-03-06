@@ -209,7 +209,7 @@ def read_job(job):
 
                 defaults.update(attrs)
 
-                attrs['job_name'] = job_name
+                defaults['job_name'] = job_name
                 sql += method(defaults)
 
         return job_name, sql
