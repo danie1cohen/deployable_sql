@@ -58,6 +58,7 @@ class PyMSSQLDeployer(BaseDeployer):
         self._exec(drop_sql)
         self._exec(build_sql)
         #self._exec('SELECT TOP 1 * FROM %s' % schema_dot_obj)
+        self.logger.info('Deployed view: %s', schema_dot_obj)
 
     def sync_function(self, path):
         """
@@ -70,6 +71,7 @@ class PyMSSQLDeployer(BaseDeployer):
         self._exec(drop_sql)
         # nothing fancy required here, the sql is a create statement
         self._exec(sql)
+        self.logger.info('Deployed function: %s', schema_dot_obj)
 
     def sync_stored_procedure(self, path):
         """
@@ -82,6 +84,7 @@ class PyMSSQLDeployer(BaseDeployer):
         self._exec(drop_sql)
         # nothing fancy required here, the sql is a create statement
         self._exec(sql)
+        self.logger.info('Deployed sp: %s', schema_dot_obj)
 
     def sync_job(self, path):
         """
@@ -102,6 +105,7 @@ class PyMSSQLDeployer(BaseDeployer):
 
         self._exec(drop_sql)
         self._exec(build_sql)
+        self.logger.info('Deployed job: %s', schema_dot_obj)
 
     def sync_permission(self, path):
         """Ignore."""

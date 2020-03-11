@@ -44,7 +44,7 @@ LOGGERS = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
             'stream': 'ext://sys.stdout',
-            'level': 'DEBUG'
+            'level': 'INFO'
             }
         },
     'root': {
