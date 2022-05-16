@@ -11,12 +11,12 @@ config = {
     'url': 'https://github.com/danie1cohen/deployable_sql',
     'download_url': 'https://github.com/danie1cohen/deployable_sql/archive/master.zip',
     'author_email': 'daniel.o.cohen@gmail.com',
-    'version': '1.0.0',
+    'version': '1.0.1',
     'install_requires': [
-        'pymssql==2.1.3',
-        'docopt==0.6.2',
-        'python-dateutil==2.5.3',
-        'PyYAML==4.2b1'
+        'pymssql',
+        'docopt',
+        'python-dateutil',
+        'PyYAML'
     ],
     'packages': find_packages(),
     'scripts': ['bin/deploy_sql.py'],
