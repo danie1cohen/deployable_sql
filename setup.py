@@ -10,7 +10,7 @@ config = {
     'author': 'Dan Cohen',
     'url': 'https://github.com/danie1cohen/deployable_sql',
     'download_url': 'https://github.com/danie1cohen/deployable_sql/archive/master.zip',
-    'author_email': 'daniel.o.cohen@gmail.com',
+    'author_email': '8837255+danie1cohen@users.noreply.github.com',
     'version': '1.0.1',
     'install_requires': [
         'pymssql',
